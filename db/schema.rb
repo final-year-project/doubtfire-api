@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160503222451) do
+ActiveRecord::Schema.define(version: 20160705025331) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,18 @@ ActiveRecord::Schema.define(version: 20160503222451) do
   end
 
   add_index "helpdesk_schedules", ["user_id"], name: "index_helpdesk_schedules_on_user_id", using: :btree
+
+  create_table "helpdesk_tickets", force: true do |t|
+    t.integer  "project_id",                  null: false
+    t.integer  "task_id"
+    t.string   "comments"
+    t.boolean  "is_resolved", default: false, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "helpdesk_tickets", ["project_id"], name: "index_helpdesk_tickets_on_project_id", using: :btree
+  add_index "helpdesk_tickets", ["task_id"], name: "index_helpdesk_tickets_on_task_id", using: :btree
 
   create_table "learning_outcome_task_links", force: true do |t|
     t.text     "description"
@@ -250,7 +262,6 @@ ActiveRecord::Schema.define(version: 20160503222451) do
     t.datetime "submission_date"
     t.datetime "assessment_date"
     t.integer  "grade"
-    t.integer  "times_submitted",      default: 0
   end
 
   add_index "tasks", ["group_submission_id"], name: "index_tasks_on_group_submission_id", using: :btree
