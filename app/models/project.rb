@@ -21,6 +21,8 @@ class Project < ActiveRecord::Base
 
   has_many :learning_outcome_task_links, through: :tasks
 
+  has_many :helpdesk_tickets, dependent: :destroy
+
   validate :must_be_in_group_tutorials
 
   #
