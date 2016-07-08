@@ -24,4 +24,19 @@ class HelpdeskTicket < ActiveRecord::Base
     self.is_resolved = true
     self.save!
   end
+
+  # Unit for ticket
+  def unit
+    project.unit
+  end
+
+  # Student for ticket
+  def student
+    project.student
+  end
+
+  # Returns true iff ticket is associated with a task
+  def has_task?
+    !task.nil?
+  end
 end
