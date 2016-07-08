@@ -32,6 +32,7 @@ module Api
     mount Api::Submission::PortfolioApi
     mount Api::Submission::PortfolioEvidenceApi
     mount Api::Submission::BatchTask
+    mount Api::Helpdesk::Ticket
 
     #
     # Add auth details to all end points
@@ -51,6 +52,7 @@ module Api
     AuthHelpers.add_auth_to Api::Submission::PortfolioApi
     AuthHelpers.add_auth_to Api::Submission::PortfolioEvidenceApi
     AuthHelpers.add_auth_to Api::Submission::BatchTask
+    AuthHelpers.add_auth_to Api::Helpdesk::Ticket
 
     add_swagger_documentation \
       base_path: "http://localhost:3000/",
