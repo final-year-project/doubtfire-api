@@ -31,6 +31,13 @@ module Api
           error!({"error" => "Not authorised to create a ticket for project #{project.id}"}, 403)
         end
 
+        # Check that task matches the project id
+        unless task.nil?
+          if task.project.id != project.id then
+            error!({"error" => "Task #{task.id} isn't a task under project #{project.id}"}, 403)
+          end
+        end
+
         ticket = HelpdeskTicket.new do | t |
           t.project = project
           t.task = task
