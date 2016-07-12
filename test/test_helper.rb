@@ -20,8 +20,7 @@ require 'minitest/pride'
 require 'minitest/autorun'
 require 'minitest/osx'
 
-# Require all test helpers
-require_all 'test/helpers'
+# Require test helpers
 require 'rails/test_help'
 require 'database_cleaner'
 
@@ -54,4 +53,5 @@ class ActiveSupport::TestCase
   end
 
   # Add more helper methods to be used by all tests here...
+  require_all 'test/helpers'
 end
