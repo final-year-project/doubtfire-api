@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160705025331) do
+ActiveRecord::Schema.define(version: 20160708011422) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -74,11 +74,11 @@ ActiveRecord::Schema.define(version: 20160705025331) do
 
   add_index "helpdesk_schedules", ["user_id"], name: "index_helpdesk_schedules_on_user_id", using: :btree
 
-  create_table "helpdesk_tickets", force: true do |t|
-    t.integer  "project_id",                  null: false
+  create_table "helpdesk_tickets", force: :cascade do |t|
+    t.integer  "project_id",                               null: false
     t.integer  "task_id"
-    t.string   "comments"
-    t.boolean  "is_resolved", default: false, null: false
+    t.string   "description", limit: 2048
+    t.boolean  "is_resolved",              default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -86,7 +86,7 @@ ActiveRecord::Schema.define(version: 20160705025331) do
   add_index "helpdesk_tickets", ["project_id"], name: "index_helpdesk_tickets_on_project_id", using: :btree
   add_index "helpdesk_tickets", ["task_id"], name: "index_helpdesk_tickets_on_task_id", using: :btree
 
-  create_table "learning_outcome_task_links", force: true do |t|
+  create_table "learning_outcome_task_links", force: :cascade do |t|
     t.text     "description"
     t.integer  "rating"
     t.integer  "task_definition_id"
@@ -262,10 +262,7 @@ ActiveRecord::Schema.define(version: 20160705025331) do
     t.datetime "submission_date"
     t.datetime "assessment_date"
     t.integer  "grade"
-<<<<<<< 953e1ff32844b8fddf766854b1e267d8683d396a
     t.integer  "times_submitted",                  default: 0
-=======
->>>>>>> NEW: Add helpdesk ticket migration
   end
 
   add_index "tasks", ["group_submission_id"], name: "index_tasks_on_group_submission_id", using: :btree
