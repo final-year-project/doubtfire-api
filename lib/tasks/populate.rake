@@ -220,16 +220,16 @@ namespace :db do
     end
 
     users = {
-      acain:              {first_name: "Andrew",         last_name: "Cain",                 nickname: "Macite",         role_id: Role.admin_id},
-      cwoodward:          {first_name: "Clinton",        last_name: "Woodward",             nickname: "The Giant",      role_id: Role.admin_id},
-      ajones:             {first_name: "Allan",          last_name: "Jones",                nickname: "P-Jiddy",        role_id: Role.convenor_id},
-      rwilson:            {first_name: "Reuben",         last_name: "Wilson",               nickname: "Reubs",          role_id: Role.convenor_id},
-      akihironoguchi:     {first_name: "Akihiro",        last_name: "Noguchi",              nickname: "Animations",     role_id: Role.tutor_id},
-      acummaudo:          {first_name: "Alex",           last_name: "Cummaudo",             nickname: "Angus",          role_id: Role.convenor_id},
-      cliff:              {first_name: "Cliff",          last_name: "Warren",               nickname: "DoubtfireDude",  role_id: Role.tutor_id},
-      joostfunkekupper:   {first_name: "Joost",          last_name: "Funke Kupper",         nickname: "Joe",            role_id: Role.tutor_id},
-      angusmorton:        {first_name: "Angus",          last_name: "Morton",               nickname: "Angus",          role_id: Role.tutor_id},
-      "123456X" =>        {first_name: "Fred",           last_name: "Jones",                nickname: "Foo",            role_id: Role.student_id}
+      acain:              {first_name: "Andrew",  last_name: "Cain",          nickname: "Macite",         role_id: Role.admin_id},
+      cwoodward:          {first_name: "Clinton", last_name: "Woodward",      nickname: "The Giant",      role_id: Role.admin_id},
+      ajones:             {first_name: "Allan",   last_name: "Jones",         nickname: "P-Jiddy",        role_id: Role.convenor_id},
+      rwilson:            {first_name: "Reuben",  last_name: "Wilson",        nickname: "Reubs",          role_id: Role.convenor_id},
+      akihironoguchi:     {first_name: "Akihiro", last_name: "Noguchi",       nickname: "Animations",     role_id: Role.tutor_id},
+      acummaudo:          {first_name: "Alex",    last_name: "Cummaudo",      nickname: "DoubtfireDude",  role_id: Role.convenor_id},
+      cliff:              {first_name: "Cliff",   last_name: "Warren",        nickname: "Cliff",          role_id: Role.tutor_id},
+      joostfunkekupper:   {first_name: "Joost",   last_name: "Funke Kupper",  nickname: "Joe",            role_id: Role.tutor_id},
+      angusmorton:        {first_name: "Angus",   last_name: "Morton",        nickname: "Angus",          role_id: Role.tutor_id},
+      "123456X" =>        {first_name: "Fred",    last_name: "Jones",         nickname: "Foo",            role_id: Role.student_id}
     }
 
     10.times do |count|

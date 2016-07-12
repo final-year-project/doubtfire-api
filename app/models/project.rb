@@ -35,7 +35,8 @@ class Project < ActiveRecord::Base
       :change_tutorial,
       :make_submission,
       :get_submission,
-      :change
+      :change,
+      :create_ticket
     ]
     # What can tutors do with projects?
     tutor_role_permissions = [

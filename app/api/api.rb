@@ -32,6 +32,7 @@ module Api
     mount Api::Submission::PortfolioApi
     mount Api::Submission::PortfolioEvidenceApi
     mount Api::Submission::BatchTask
+    mount Api::Helpdesk::Ticket
 
     #
     # Add auth details to all end points
@@ -51,9 +52,17 @@ module Api
     AuthHelpers.add_auth_to Api::Submission::PortfolioApi
     AuthHelpers.add_auth_to Api::Submission::PortfolioEvidenceApi
     AuthHelpers.add_auth_to Api::Submission::BatchTask
+    AuthHelpers.add_auth_to Api::Helpdesk::Ticket
 
-    add_swagger_documentation base_path: "",
-                          # api_version: 'api',
-                  hide_documentation_path: true
+    add_swagger_documentation \
+      base_path: "http://localhost:3000/",
+      add_version: false,
+      hide_documentation_path: true,
+      info: {
+        title: "Doubtfire API Documentaion",
+        description: "Doubtfire is a modern, lightweight learning management system.",
+        license: "AGPL v3.0",
+        license_url: "https://github.com/doubtfire-lms/doubtfire-api/blob/master/LICENSE"
+      }
   end
 end
