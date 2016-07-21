@@ -6,23 +6,23 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
     @test_desc = 'Hello, World!'
     @test_project = Project.first
     @tickets = {
-      without_task: HelpdeskTicket.create! {
+      without_task: HelpdeskTicket.create!(
         project: @test_project
-      },
-      with_task: HelpdeskTicket.create! {
+      ),
+      with_task: HelpdeskTicket.create!(
         project: @test_project,
         task: @test_project.tasks.first
-      },
-      with_description: HelpdeskTicket.create! {
+      ),
+      with_description: HelpdeskTicket.create!(
         project: @test_project,
         description: @test_desc
-      }
+      )
     }
   end
 
   test "helpdesk tickets have projects" do
     @tickets.values.each do |t|
-      assert_equal t.project, @test_project
+      assert t.project, @test_project
     end
   end
 
