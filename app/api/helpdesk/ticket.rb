@@ -27,7 +27,7 @@ module Api
         project = Project.find(params[:project_id])
         task = params[:task_id].nil? ? nil : task = Task.find(params[:task_id])
 
-        if not authorise? current_user, project, :create_ticket
+        unless authorise? current_user, project, :create_ticket
           error!({"error" => "Not authorised to create a ticket for project #{project.id}"}, 403)
         end
 
@@ -46,6 +46,42 @@ module Api
 
         logger.info "Created new ticket for #{unit.name}"
       end
+
+      # ------------------------------------------------------------------------
+      # GET /helpdesk/ticket[?filter=all|resolved|unresolved]
+      # By default all
+      # ------------------------------------------------------------------------
+      desc "Gets all helpdesk tickets"
+      params do
+        optional :filter, type: String, desc: "Filter by resolved, unresolved or all. Defaults to all.", default: 'all'
+      end
+      get '/helpdesk/ticket' do
+        unless authorise? current_user, HelpdeskTicket, :get_tickets
+          error!({"error" => "Not authorised to get tickets"}, 403)
+        end
+
+        filter = params[:filter]
+
+        case filter
+        when "all"
+          HelpdeskTicket.all
+        when "resolved"
+          HelpdeskTicket.all_resolved
+        when "unresolved"
+          HelpdeskTicket.all_unresolved
+        else
+          error!({"error" => "Bad search query #{filter}"}, 404)
+        end
+
+      end
+      # ------------------------------------------------------------------------
+      # GET /helpdesk/ticket/:id
+      # ------------------------------------------------------------------------
+
+      # ------------------------------------------------------------------------
+      # GET /helpdesk/stats
+      # ------------------------------------------------------------------------
+
     end
   end
 end
