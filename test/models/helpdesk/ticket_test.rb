@@ -28,7 +28,7 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
 
   test "only one helpdesk ticket has a description" do
     assert_not_nil @tickets[:with_description].description
-    assert_equal @tickets[:with_description], @test_desc
+    assert_equal @tickets[:with_description].description, @test_desc
     assert_nil @tickets[:with_task].description
     assert_nil @tickets[:without_task].description
   end
@@ -78,4 +78,5 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
   test "the unit method should match the associated project's unit" do
     assert_equal HelpdeskTicket.first.unit, @test_project.unit
   end
+
 end
