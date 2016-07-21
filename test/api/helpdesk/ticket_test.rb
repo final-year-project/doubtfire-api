@@ -39,11 +39,11 @@ class TicketsTest < ActiveSupport::TestCase
 
   # Test POST for a ticket with and id
   def test_post_heldpesk_ticket
-    auth_token = auth_token_for(Project.first.user)
+    @auth_token = auth_token_for(Project.first.user)
     project_id = Project.first.id
     description = "jake renzella's comment :)"
 
-    post "/api/helpdesk/ticket.json?project_id=#{project_id}?description=#{description}?auth_token=#{auth_token}"
+    post "/api/helpdesk/ticket.json?project_id=#{project_id}?description=#{description}?auth_token=#{@auth_token}"
 
     actual_ticket = JSON.parse(last_response.body)[0]
     puts "actual_tickets: #{actual_ticket}"
