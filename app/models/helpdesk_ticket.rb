@@ -15,18 +15,22 @@ class HelpdeskTicket < ActiveRecord::Base
   def self.permissions
     # What can students do with all tickets?
     student_role_permissions = [
+      :get_details
     ]
     # What can tutors do with all tickets?
     tutor_role_permissions = [
-      :get_tickets
+      :get_tickets,
+      :get_details
     ]
     # What can convenors do with all tickets?
     convenor_role_permissions = [
-      :get_tickets
+      :get_tickets,
+      :get_details
     ]
     # What can admins do with all tickets?
     admin_role_permissions = [
-      :get_tickets
+      :get_tickets,
+      :get_details
     ]
     # What can nil users do with all tickets?
     nil_role_permissions = [
@@ -45,6 +49,16 @@ class HelpdeskTicket < ActiveRecord::Base
 
   def self.role_for(user)
     user.role
+  end
+
+  def role_for(user)
+    if user == project.user
+      Role.student
+    elsif user.role != Role.student
+      user.role
+    else
+      nil
+    end
   end
 
   # Returns back all unresolved tickets
