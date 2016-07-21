@@ -135,14 +135,49 @@ class DatabasePopulator
       generate_and_align_ilos_for_unit(unit, unit_details)
       generate_tutorials_and_enrol_students_for_unit(unit, unit_details)
     end
+    puts "!"
   end
 
   #
-  # Random project helper
+  # Generates some units
   #
-  def random_project
-    id = Project.pluck(:id).sample
-    Project.find(id)
+  def generate_units
+    puts "--> Generating units"
+
+    if @user_cache.empty?
+      # Must generate users first!
+      puts "---> No users generated. Generating users first..."
+      generate_users()
+    end
+
+    # Set sizes from scale
+    some_tasks = @scale[:some_tasks]
+    many_tasks = @scale[:many_tasks]
+    some_tutorials = @scale[:some_tutorials]
+    many_tutorials = @scale[:many_tutorials]
+
+    # Run through the unit_details and initialise their data
+    @unit_data.each do | unit_key, unit_details |
+      puts "---> Generating unit #{unit_details[:code]}"
+      unit = Unit.create!(
+        code: unit_details[:code],
+        name: unit_details[:name],
+        description: Populator.words(10..15),
+        start_date: Time.zone.now  - 6.weeks,
+        end_date: 13.weeks.since(Time.zone.now - 6.weeks)
+      )
+      # Assign the convenors for this unit
+      unit_details[:convenors].each do | user_key |
+        puts "----> Adding convenor #{user_key}"
+        unit.employ_staff(@user_cache[user_key], Role.convenor)
+      end
+      # Cache what we have
+      @unit_cache[unit_key] = unit
+      # Generate other unit-related stuff
+      generate_tasks_for_unit(unit, unit_details)
+      generate_and_align_ilos_for_unit(unit, unit_details)
+      generate_tutorials_and_enrol_students_for_unit(unit, unit_details)
+    end
   end
 
   private
