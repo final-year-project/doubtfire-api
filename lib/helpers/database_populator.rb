@@ -28,7 +28,8 @@ class DatabasePopulator
         few_tutorials: 1,
         some_tutorials: 1,
         many_tutorials: 1,
-        max_tutorials: 4
+        max_tutorials: 4,
+        tickets_generated: 10
       },
       large: {
         min_students: 15,
@@ -39,7 +40,8 @@ class DatabasePopulator
         few_tutorials: 1,
         some_tutorials: 2,
         many_tutorials: 4,
-        max_tutorials: 20
+        max_tutorials: 20,
+        tickets_generated: 50
       }
     }
     accepted_scale_types = scale_data.keys
@@ -66,6 +68,33 @@ class DatabasePopulator
     roles.each do |role|
       puts "--> Adding #{role}"
       @role_cache[role] = Role.create!(name: role.to_s.titleize)
+    end
+  end
+
+  #
+  # Random project helper
+  #
+  def random_project
+    id = Project.pluck(:id).sample
+    Project.find(id)
+  end
+
+  #
+  # Generate some helpdesk tickets
+  #
+  def generate_helpdesk_tickets
+    scale = @scale[:tickets_generated]
+    puts "-> Generating #{scale} helpdesk tickets"
+    unless Project.all.empty?
+      throw "No projects generated. Use generate_projects first before calling generate_helpdesk_tickets."
+    end
+    scale.times do | count |
+      project = self.random_project
+      HelpdeskTicket.create! {
+        project: project,
+        task: project.tasks.first
+        is_resolved: rand(0..1) == 0
+      }
     end
   end
 
