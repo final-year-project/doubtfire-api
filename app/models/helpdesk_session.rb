@@ -26,13 +26,52 @@ class HelpdeskSession < ActiveRecord::Base
     end
   end
 
-  # Clock on time is only set on creation of the session
-  attr_readonly :clock_on_time
+  #
+  # Permissions around helpdesk sessions
+  #
+  def self.permissions
+    # What can students do with sessions?
+    student_role_permissions = [
+      :get_all_current_session_users
+    ]
+    # What can tutors do with sessions?
+    tutor_role_permissions = [
+      :create_session,
+      :clock_off_session,
+      :get_all_current_session_users
+    ]
+    # What can convenors do with sessions?
+    convenor_role_permissions = [
+      :create_session,
+      :clock_off_session,
+      :get_all_current_session_users
+    ]
+    # What can admins do with sessions?
+    admin_role_permissions = [
+      :create_session,
+      :clock_off_session,
+      :get_all_current_session_users
+    ]
+    # What can nil users do with sessions?
+    nil_role_permissions = [
+    ]
 
-  # Always initialise clock_on_time to when the session is created (now)
-  after_initialize :set_clock_on_time_to_now
-  def set_clock_on_time_to_now
-    self.clock_on_time = DateTime.now
+    # Return permissions hash
+    {
+      :admin    => admin_role_permissions,
+      :convenor => convenor_role_permissions,
+      :tutor    => tutor_role_permissions,
+      :student  => student_role_permissions,
+      :nil      => nil_role_permissions
+    }
+  end
+
+  def self.role_for(user)
+    user.role
+  end
+
+  def role_for(user)
+    user.role
   end
 
   #
@@ -55,5 +94,34 @@ class HelpdeskSession < ActiveRecord::Base
   #
   def self.users_working_now
     active_sessions.map(&:user)
+  end
+
+  #
+  # Returns true if this session is clocked off
+  #
+  def clocked_off?
+    clock_off_time < DateTime.now
+  end
+
+  #
+  # Returns true if this session is clocked on
+  #
+  def clocked_on?
+    !clocked_off?
+  end
+
+  #
+  # Checks if the user provided is currently clocked off
+  #
+  def self.user_clocked_off?(user)
+    # Should have no sessions clocked on thus nothing found clocked on
+    user.helpdesk_sessions.find(&:clocked_on?).nil?
+  end
+
+  #
+  # Checks if the user provided is currently clocked on
+  #
+  def self.user_clocked_on?(user)
+    !user_clocked_off(user)
   end
 end
