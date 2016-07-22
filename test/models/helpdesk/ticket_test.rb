@@ -1,17 +1,17 @@
 require "test_helper"
 
 class HelpdeskTicketTest < ActiveSupport::TestCase
-
   setup do
     @test_desc = 'Hello, World!'
-    @test_project = Project.first
+    @test_project = Randomizer.random_record_for_model(Project)
+    @test_task = Randomizer.random_task_for_project(@test_project)
     @tickets = {
       without_task: HelpdeskTicket.create!(
         project: @test_project
       ),
       with_task: HelpdeskTicket.create!(
         project: @test_project,
-        task: @test_project.tasks.first
+        task: @test_task
       ),
       with_description: HelpdeskTicket.create!(
         project: @test_project,
@@ -34,7 +34,7 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
   end
 
   test "only one helpdesk ticket has a task" do
-    assert_not_nil @tickets[:with_task].task
+    assert_equal @tickets[:with_task].task, @test_task
     assert_nil @tickets[:with_description].task
     assert_nil @tickets[:without_task].task
   end
@@ -47,7 +47,7 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
     assert_equal @tickets[:without_task], ticket_to_resolve
     # others should remain false
     refute @tickets[:with_task].is_resolved
-    refute @tickets[:without_task].is_resolved
+    refute @tickets[:with_description].is_resolved
   end
 
   test "all resolved helpdesk tickets when one is resolved" do
@@ -78,5 +78,4 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
   test "the unit method should match the associated project's unit" do
     assert_equal HelpdeskTicket.first.unit, @test_project.unit
   end
-
 end
