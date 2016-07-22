@@ -26,7 +26,6 @@ class TicketsTest < ActiveSupport::TestCase
   def test_get_heldpesk_tickets
     get "/api/helpdesk/ticket.json?filter=#all?auth_token=#{@auth_token}"
     actual_ticket = JSON.parse(last_response.body)[0]
-    puts "actual_tickets: #{actual_ticket}"
   end
 
   # Test GET for a ticket with and id
@@ -49,4 +48,3 @@ class TicketsTest < ActiveSupport::TestCase
     puts "actual_tickets: #{actual_ticket}"
   end
 end
-
