@@ -177,6 +177,7 @@ namespace :db do
     dbpop = DatabasePopulator.new ENV['SCALE']
     dbpop.generate_users()
     dbpop.generate_units()
+    dbpop.generate_helpdesk_tickets()
 
     # Run simulate signoff?
     unless !args.nil? && args[:extend_populate]

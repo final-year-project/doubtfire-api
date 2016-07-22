@@ -29,7 +29,7 @@ class DatabasePopulator
         some_tutorials: 1,
         many_tutorials: 1,
         max_tutorials: 4,
-        tickets_generated: 10
+        tickets_to_generate: 10
       },
       large: {
         min_students: 15,
@@ -41,7 +41,7 @@ class DatabasePopulator
         some_tutorials: 2,
         many_tutorials: 4,
         max_tutorials: 20,
-        tickets_generated: 50
+        tickets_to_generate: 50
       }
     }
     accepted_scale_types = scale_data.keys
@@ -178,6 +178,30 @@ class DatabasePopulator
       generate_and_align_ilos_for_unit(unit, unit_details)
       generate_tutorials_and_enrol_students_for_unit(unit, unit_details)
     end
+  end
+
+  #
+  # Generates helpdesk tickets
+  #
+  def generate_helpdesk_tickets
+    tickets_to_generate = @scale[:tickets_to_generate]
+    print "-> Generating #{tickets_to_generate} helpdesk tickets"
+    tickets_to_generate.times do
+      project = Randomizer.random_record_for_model(Project)
+      throw "Must create projects before calling generate_helpdesk_tickets" if project.nil?
+      # 1/4 chance of getting nil task
+      task = rand(0..3) == 0 ? nil : Randomizer.random_task_for_project(project)
+      # 1/4 chance of being resolved
+      is_resolved = rand(0..3) == 0
+      HelpdeskTicket.create(
+        project: project,
+        task: task,
+        description: Populator.words(5..10),
+        is_resolved: is_resolved
+      )
+      print "."
+    end
+    puts "!"
   end
 
   private

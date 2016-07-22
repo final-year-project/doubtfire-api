@@ -8,5 +8,6 @@ namespace :test do
     dbpop = DatabasePopulator.new
     dbpop.generate_users()
     dbpop.generate_units()
+    dbpop.generate_helpdesk_tickets()
   end
 end
