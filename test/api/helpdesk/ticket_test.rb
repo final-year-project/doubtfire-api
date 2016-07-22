@@ -9,34 +9,33 @@ class TicketsTest < ActiveSupport::TestCase
     Rails.application
   end
 
-  # --------------------------------------------------------------------------- #
-  # --- Endpoint testing for:
-  # ------- /helpdesk/tickets.json
-  # ------- GET
-  # --------------------------------------------------------------------------- #
-  # POST tests
-
-  # GET tests
-  # Test GET for all tickets
-  def test_get_helpdesk_tickets
-    get with_auth_token "/api/helpdesk/ticket.json"
-    actual_ticket = JSON.parse(last_response.body)[0]
-  end
-
-  # Test GET for a ticket with and id
-  def test_get_helpdesk_ticket_with_id
-    id = 0;
-    get with_auth_token "/api/helpdesk/ticket/#{id}.json"
-    actual_ticket = JSON.parse(last_response.body)[0]
-  end
-
-  # Test POST for a ticket with and id
+  # POST /helpdesk/ticket
   def test_post_helpdesk_ticket
     project_id = Project.first.id
     description = "jake renzella's comment :)"
 
-    post with_auth_token "/api/helpdesk/ticket.json?project_id=#{project_id}&description=#{description}", Project.first.user
+    post with_auth_token "/api/helpdesk/ticket?project_id=#{project_id}&description=#{description}", Project.first.user
 
     actual_ticket = JSON.parse(last_response.body)[0]
+  end
+
+  # GET /helpdesk/ticket
+  def test_get_unresolved_helpdesk_tickets
+    get with_auth_token "/api/helpdesk/ticket"
+    assert_json_equal HelpdeskTicket.all_unresolved, last_response_body
+  end
+
+  # GET /helpdesk/ticket?filter=resolved
+  def test_get_resolved_helpdesk_tickets
+    get with_auth_token "/api/helpdesk/ticket?filter=resolved"
+    assert_json_equal HelpdeskTicket.all_resolved, last_response_body
+  end
+
+  # GET /helpdesk/ticket/:id
+  # id = 1
+  def test_get_helpdesk_ticket_with_id
+    id = 1
+    get with_auth_token "/api/helpdesk/ticket/#{id}"
+    assert_json_equal HelpdeskTicket.find(id), last_response_body
   end
 end

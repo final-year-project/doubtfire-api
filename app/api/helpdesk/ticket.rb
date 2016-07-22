@@ -42,14 +42,14 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/ticket[?filter=all|resolved|unresolved]
+      # GET /helpdesk/ticket/:filter
       # By default all
       # ------------------------------------------------------------------------
       desc "Gets all helpdesk tickets"
       params do
         optional :filter, type: String, desc: "Filter by resolved, unresolved or all. Defaults to all (unresolved).", default: 'all'
       end
-      get '/helpdesk/ticket/:filter' do
+      get '/helpdesk/ticket' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
           error!({"error" => "Not authorised to get tickets"}, 403)
         end
@@ -68,7 +68,7 @@ module Api
       # ------------------------------------------------------------------------
       desc "Gets helpdesk ticket with an id"
       params do
-        requires :id, type: Integer, :desc => "The id to of the ticket to get"
+        requires :id, type: Integer, :desc => "The id of the ticket to get"
       end
       get '/helpdesk/ticket/:id' do
         ticket = HelpdeskTicket.find(params[:id])
@@ -83,9 +83,9 @@ module Api
       # ------------------------------------------------------------------------
       # PUT /helpdesk/ticket/:id
       # ------------------------------------------------------------------------
-      desc "PUTS helpdesk ticket with an id"
+      desc "Updates helpdesk ticket with an id"
       params do
-        requires :id, type: Integer, :desc => "The id to of the ticket to get"
+        requires :id, type: Integer, :desc => "The id to of the ticket to update"
         requires :description, type: String, :desc => "The new description of this ticket"
       end
       put '/helpdesk/ticket/:id' do
