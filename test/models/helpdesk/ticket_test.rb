@@ -50,32 +50,19 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
     refute @tickets[:with_description].is_resolved
   end
 
-  test "all resolved helpdesk tickets when one is resolved" do
-    ticket_to_resolve = HelpdeskTicket.all.first
-    assert_equal HelpdeskTicket.all_resolved.length, 0
-    ticket_to_resolve.resolve
-    assert_equal HelpdeskTicket.all_resolved.length, 1
-    # The resolved ticket must match
-    assert_equal HelpdeskTicket.all_resolved.first, ticket_to_resolve
-  end
-
-  test "all unresolved helpdesk tickets should remain when resolving a ticket" do
-    ticket_to_resolve = HelpdeskTicket.all.first
-    assert_equal HelpdeskTicket.all_unresolved.length, 3
-    ticket_to_resolve.resolve
-    # The others should be untouched!
-    assert_equal HelpdeskTicket.all_unresolved.length, 2
-  end
-
   test "the has_task? method should be true if the task has a task" do
     assert @tickets[:with_task].has_task?
   end
 
   test "the student method should match the associated project's student" do
-    assert_equal HelpdeskTicket.first.student, @test_project.student
+    assert_equal @tickets[:with_task].student, @test_project.student
+    assert_equal @tickets[:with_task].student, @test_project.student
+    assert_equal @tickets[:with_description].student, @test_project.student
   end
 
   test "the unit method should match the associated project's unit" do
-    assert_equal HelpdeskTicket.first.unit, @test_project.unit
+    assert_equal @tickets[:with_task].unit, @test_project.unit
+    assert_equal @tickets[:with_task].unit, @test_project.unit
+    assert_equal @tickets[:with_description].unit, @test_project.unit
   end
 end
