@@ -42,4 +42,18 @@ class HelpdeskSession < ActiveRecord::Base
     self.clock_off_time = DateTime.now
     save!
   end
+
+  #
+  # Returns all currently active sessions
+  #
+  def self.active_sessions
+    where('clock_off_time > ?', DateTime.now)
+  end
+
+  #
+  # Returns all users currently working now
+  #
+  def self.users_working_now
+    active_sessions.map(&:user)
+  end
 end
