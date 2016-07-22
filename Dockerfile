@@ -8,7 +8,8 @@ RUN apt-get install -y \
   libmagic-dev \
   libpq-dev \
   python-pygments \
-  ghostscript
+  ghostscript \
+  texlive-full
 
 ADD . /doubtfire-api
 WORKDIR /doubtfire-api
