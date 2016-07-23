@@ -20,3 +20,4 @@ WORKDIR /doubtfire-api
 EXPOSE 3000
 
 RUN bundle install --without production test replica
+RUN rake db:populate SCALE=large EXTENDED=true
