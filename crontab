@@ -1,0 +1,1 @@
+00 00 * * * root rake db:populate SCALE=large EXTENDED=true

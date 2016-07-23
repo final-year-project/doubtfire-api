@@ -13,6 +13,11 @@ RUN apt-get install -y \
 RUN apt-get install --no-install-recommends -y \
   texlive-latex-recommended
 
+RUN apt-get install -y cron
+
+ADD crontab /etc/cron.d/repopulate-df
+RUN chmod 06444 /etc/cron.d/repopulate-df
+CMD cron
 
 ADD . /doubtfire-api
 WORKDIR /doubtfire-api
