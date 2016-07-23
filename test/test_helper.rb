@@ -52,7 +52,4 @@ class ActiveSupport::TestCase
 
   extend MiniTest::Spec::DSL
 
-  register_spec_type self do |desc|
-    desc < ActiveRecord::Base if desc_is_a? Class
-  end
 end
