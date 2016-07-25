@@ -77,6 +77,23 @@ class HelpdeskTicket < ActiveRecord::Base
     self.save!
   end
 
+  # Calculates the average time to resolve a ticket from the duration
+  # provided (i.e., between from and now). If no arguments are provided,
+  # all resolved tickets will be used regardless of when they were resolved.
+  # Where no tickets are found within the period, nil is returned.
+  def self.average_resolve_time(from = nil, to = DateTime.now)
+    tickets = from ? all_resolved.where(resolved_at: from..to) : all_resolved
+    tickets.average(:minutes_to_resolve).to_f unless tickets.empty?
+  end
+
+  # Resolves the ticket
+  def resolve
+    self.is_resolved = true
+    self.resolved_at = DateTime.now
+    self.minutes_to_resolve = ((resolved_at - created_at) / 60).to_f.round(2)
+    save!
+  end
+
   # Unit for ticket
   def unit
     project.unit
