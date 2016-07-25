@@ -37,7 +37,7 @@ module Api
           t.description = params[:description]
         end
 
-        logger.info "#{current_user.username} created new ticket #{t.id} for #{ticket.unit.name}"
+        logger.info "#{current_user.username} created new ticket #{ticket.id} for #{ticket.unit.name}"
         ticket
       end
 
