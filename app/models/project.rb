@@ -863,6 +863,8 @@ EOF
   # task if the task does not exist for this project.
   #
   def task_for_task_definition(td)
+    # Find the definition if a ID is passed in.
+    td = TaskDefinition.find(td) if td.is_a? Fixnum
     logger.debug "Finding task #{td.abbreviation} for project #{log_details()}"
     result = tasks.where(task_definition: td).first
     if result.nil?
