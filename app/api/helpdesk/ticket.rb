@@ -31,11 +31,11 @@ module Api
           error!({"error" => "Not authorised to create a ticket for project #{project.id}"}, 403)
         end
 
-        ticket = HelpdeskTicket.new do | t |
-          t.project = project
-          t.task = task
-          t.description = params[:description]
-        end
+        ticket = HelpdeskTicket.create!({
+          project: project,
+          task: task,
+          description: params[:description]
+        })
 
         logger.info "#{current_user.username} created new ticket #{ticket.id} for #{ticket.unit.name}"
         ticket
