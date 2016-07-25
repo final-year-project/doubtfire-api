@@ -11,12 +11,19 @@ class TicketsTest < ActiveSupport::TestCase
 
   # POST /helpdesk/ticket
   def test_post_helpdesk_ticket
-    project_id = Project.first.id
-    description = "jake renzella's comment :)"
+    project = Randomizer.random_record_for_model(Project)
 
-    post with_auth_token "/api/helpdesk/ticket?project_id=#{project_id}&description=#{description}", Project.first.user
+    ticket = {
+      project_id: project.id,
+      description: Populator.words(5..10),
+      task_definition_id: rand > 0.33 ? Randomizer.random_task_def_for_project(project).id : nil
+    }
 
-    actual_ticket = JSON.parse(last_response.body)[0]
+    data_to_post = add_auth_token ticket, project.user
+    post_json "/api/helpdesk/ticket", data_to_post
+
+    expected_ticket = HelpdeskTicket.last
+    assert_json_equal expected_ticket, last_response_body
   end
 
   # GET /helpdesk/ticket
