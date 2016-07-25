@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160725141011) do
+ActiveRecord::Schema.define(version: 20160725144833) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,13 +75,14 @@ ActiveRecord::Schema.define(version: 20160725141011) do
   add_index "helpdesk_schedules", ["user_id"], name: "index_helpdesk_schedules_on_user_id", using: :btree
 
   create_table "helpdesk_tickets", force: :cascade do |t|
-    t.integer  "project_id",                               null: false
+    t.integer  "project_id",                                      null: false
     t.integer  "task_id"
-    t.string   "description", limit: 2048
-    t.boolean  "is_resolved",              default: false, null: false
+    t.string   "description",        limit: 2048
+    t.boolean  "is_resolved",                     default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "resolved_at"
+    t.float    "minutes_to_resolve"
   end
 
   add_index "helpdesk_tickets", ["project_id"], name: "index_helpdesk_tickets_on_project_id", using: :btree
