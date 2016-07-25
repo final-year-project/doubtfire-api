@@ -192,15 +192,19 @@ class DatabasePopulator
       throw "Must create projects before calling generate_helpdesk_tickets" if project.nil?
       # 1/4 chance of getting nil task
       task = rand(0..3) == 0 ? nil : Randomizer.random_task_for_project(project)
-      # 1/4 chance of being resolved
-      is_resolved = rand(0..3) == 0
-      resolved_at = DateTime.now + rand(0..15).minutes if is_resolved
+      # 3/4 chance of being resolved
+      is_resolved = rand(0..3) != 0
+      if is_resolved
+        minutes_to_resolve = rand(0..15)
+        resolved_at = DateTime.now + minutes_to_resolve.minutes
+      end
       HelpdeskTicket.create(
         project: project,
         task: task,
         description: Populator.words(5..10),
         is_resolved: is_resolved,
-        resolved_at: resolved_at
+        resolved_at: resolved_at,
+        minutes_to_resolve: minutes_to_resolve
       )
       print "."
     end
