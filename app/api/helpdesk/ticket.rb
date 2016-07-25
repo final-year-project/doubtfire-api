@@ -25,7 +25,8 @@ module Api
       end
       post '/helpdesk/ticket' do
         project = Project.find(params[:project_id])
-        task = params[:task_definition_id].nil? ? nil : task = project.task_for_task_definition(find(params[:task_definition_id]))
+        task = params[:task_definition_id].nil? ? nil : task = project.task_for_task_definition(params[:task_definition_id])
+
 
         unless authorise? current_user, project, :create_ticket
           error!({"error" => "Not authorised to create a ticket for project #{project.id}"}, 403)
