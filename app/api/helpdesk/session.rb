@@ -15,14 +15,14 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # POST /helpdesk/session
+      # POST /helpdesk/sessions
       # ------------------------------------------------------------------------
       desc "Begin a new session at the helpdesk as current user"
       params do
         requires :clock_off_time, type: DateTime, :desc => "The estimated clock off time when the user ends working"
         optional :user_id, type: Integer, :desc => "The user who is about to begin working (if blank, posting user is used)"
       end
-      post '/helpdesk/session' do
+      post '/helpdesk/sessions' do
         unless authorise? current_user, HelpdeskSession, :create_session
           error!({"error" => "Not authorised to create a helpdesk session"}, 403)
         end
@@ -43,13 +43,13 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # DELETE /helpdesk/session/:id
+      # DELETE /helpdesk/sessions/:id
       # ------------------------------------------------------------------------
       desc "Prematurely clock off an existing helpdesk session"
       params do
         requires :id, type: Integer, :desc => "The session to clock off"
       end
-      delete '/helpdesk/session/:id' do
+      delete '/helpdesk/sessions/:id' do
         session = HelpdeskSession.find(params[:id])
         unless authorise? current_user, session, :clock_off_session
           error!({"error" => "Not authorised to clock off helpdesk session (id=#{session.id})"}, 403)
@@ -64,10 +64,10 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/session/tutors
+      # GET /helpdesk/sessions/tutors
       # ------------------------------------------------------------------------
       desc "Get a list of all currently tutors working at the helpdesk"
-      get '/helpdesk/session/tutors' do
+      get '/helpdesk/sessions/tutors' do
         unless authorise? current_user, HelpdeskSession, :get_all_current_session_users
           error!({"error" => "Not authorised view current helpdesk staff"}, 403)
         end
