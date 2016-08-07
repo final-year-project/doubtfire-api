@@ -46,14 +46,16 @@ class HelpdeskSession < ActiveRecord::Base
       :create_session,
       :clock_off_session,
       :get_all_current_session_users,
-      :get_sessions
+      :get_sessions,
+      :get_stats
     ]
     # What can admins do with sessions?
     admin_role_permissions = [
       :create_session,
       :clock_off_session,
       :get_all_current_session_users,
-      :get_sessions
+      :get_sessions,
+      :get_stats
     ]
     # What can nil users do with sessions?
     nil_role_permissions = [
@@ -81,12 +83,60 @@ class HelpdeskSession < ActiveRecord::Base
       user.role
     end
   end
+
   #
   # Override the clock off time to set it to now
   #
   def clock_off
     self.clock_off_time = DateTime.now
     save!
+  end
+
+  #
+  # Returns the average time of staff sessions within the given timeframe
+  # grouped by user id
+  #
+  def self.average_session_time_by_staff_between(from = nil, to = DateTime.now)
+    sessions_by_staff_between.map do |user, sessions|
+      durations = sessions.map(&:session_duration)
+      average_duration = durations.inject(:+) / durations.length
+      { user: user, duration: average_duration }
+    end
+  end
+  def self.average_session_time_by_staff
+    average_session_time_by_staff_between
+  end
+
+  #
+  # Returns the count of staff sessions within the given timeframe
+  # grouped by user id
+  #
+  def self.session_count_by_staff_between(from = nil, to = DateTime.now)
+    sessions_by_staff_between.map do |user, sessions|
+      { user: user, count: sessions.count }
+    end
+  end
+  def self.session_count_by_staff
+    session_count_by_staff_between
+  end
+
+  #
+  # Returns the staff sessions within the given timeframe grouped by user id
+  #
+  def self.sessions_by_staff_between(from = nil, to = DateTime.now)
+    sessions_between(from, to).group_by(&:user)
+  end
+  def self.sessions_by_staff
+    sessions_by_staff_between
+  end
+
+  #
+  # Returns all sessions within the time-frame given
+  #
+  def self.sessions_between(from = nil, to = DateTime.now)
+    to ||= DateTime.now
+    return where('clock_on_time > ? AND clock_off_time < ?', from, to) unless from.nil?
+    where('clock_off_time < ?', to)
   end
 
   #
@@ -130,5 +180,12 @@ class HelpdeskSession < ActiveRecord::Base
   #
   def self.user_clocked_on?(user)
     !user_clocked_off(user)
+  end
+
+  #
+  # Returns the duration of time for a session in hours
+  #
+  def session_duration
+    (clock_off_time - clock_on_time) / 60 / 60
   end
 end

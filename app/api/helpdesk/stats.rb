@@ -18,7 +18,7 @@ module Api
       # ------------------------------------------------------------------------
       desc "Gets statistics about the helpdesk for the duration specified"
       params do
-        requires :from, type: DateTime, desc: "The time to start getting statistics"
+        optional :from, type: DateTime, desc: "The time to start getting statistics (do not provide for all stats)"
         optional :to,   type: DateTime, desc: "The time to stop getting statistics (defaults to current time)", default: DateTime.now
       end
       get '/helpdesk/stats' do
@@ -31,10 +31,23 @@ module Api
         from = params[:from]
         to   = params[:to] || DateTime.now
 
-        {
-          tickets_resolved:     HelpdeskTicket.resolved_betweeen(from, to).length,
-          average_wait_time:    HelpdeskTicket.average_resolve_time(from, to)
+        response = {
+          tickets: {
+            resolved_count:     HelpdeskTicket.resolved_betweeen(from, to).length,
+            number_unresolved:  HelpdeskTicket.all_unresolved.length,
+            average_wait_time:  HelpdeskTicket.average_resolve_time_between(from, to) * HelpdeskTicket.all_unresolved.length,
+          }
         }
+
+        if authorise? current_user, HelpdeskSession, :get_stats
+          response[:sessions] = {
+            all_session_count:            HelpdeskSession.sessions_between(from, to).length,
+            session_count_by_staff_id:    HelpdeskSession.session_count_by_staff_between(from, to),
+            avg_session_time_by_staff_id: HelpdeskSession.average_session_time_by_staff_between(from, to)
+          }
+        end
+
+        response
       end
     end
   end
