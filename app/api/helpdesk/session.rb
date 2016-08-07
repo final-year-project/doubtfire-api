@@ -30,7 +30,7 @@ module Api
         # TODO: Doesn't this mean I can create a session on another person's behalf?
         #       Is this what we want?
         if HelpdeskSession.user_clocked_off?(user)
-          session = HelpdeskSession.create(
+          session = HelpdeskSession.create!(
             user: user,
             clock_on_time: DateTime.now, # Clock on immediately when ticket is created
             clock_off_time: params[:clock_off_time]
@@ -52,15 +52,13 @@ module Api
       delete '/helpdesk/session/:id' do
         session = HelpdeskSession.find(params[:id])
         unless authorise? current_user, session, :clock_off_session
-          error!({"error" => "Not authorised to clock off a helpdesk session"}, 403)
+          error!({"error" => "Not authorised to clock off helpdesk session (id=#{session.id})"}, 403)
         end
-        # TODO: Does this mean I can clock off other users? Is that what we want?
-        #       Or do we validate that current_user is the session user?
-        unless session.clocked_off?
+        if session.clocked_off?
+          logger.info "#{current_user.username} attempted to clock off already clocked off helpdesk session (id=#{session.id})"
+        else
           session.clock_off
           logger.info "#{current_user.username} prematurely clocked off helpdesk session (id=#{session.id})"
-        else
-          logger.info "#{current_user.username} attempted to clock off already clocked off helpdesk session (id=#{session.id})"
         end
         session
       end
