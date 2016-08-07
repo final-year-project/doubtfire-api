@@ -38,19 +38,22 @@ class HelpdeskSession < ActiveRecord::Base
     tutor_role_permissions = [
       :create_session,
       :clock_off_session,
-      :get_all_current_session_users
+      :get_all_current_session_users,
+      :get_sessions
     ]
     # What can convenors do with sessions?
     convenor_role_permissions = [
       :create_session,
       :clock_off_session,
-      :get_all_current_session_users
+      :get_all_current_session_users,
+      :get_sessions
     ]
     # What can admins do with sessions?
     admin_role_permissions = [
       :create_session,
       :clock_off_session,
-      :get_all_current_session_users
+      :get_all_current_session_users,
+      :get_sessions
     ]
     # What can nil users do with sessions?
     nil_role_permissions = [

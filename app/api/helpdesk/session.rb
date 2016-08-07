@@ -15,6 +15,31 @@ module Api
       end
 
       # ------------------------------------------------------------------------
+      # GET /helpdesk/sessions?user_id=[id]&is_active=[true|false]
+      # ------------------------------------------------------------------------
+      desc "Get helpdesk sessions"
+      params do
+        optional :user_id,   type: Integer, :desc => "Filter by specific user id"
+        optional :is_active, type: Boolean, :desc => "Filter to only active sessions"
+      end
+      get '/helpdesk/sessions' do
+        unless authorise? current_user, HelpdeskSession, :get_sessions
+          error!({"error" => "Not authorised get helpdesk sessions"}, 403)
+        end
+        if params.empty?
+          logger.info "#{current_user.username} requested all helpdesk sessions"
+          HelpdeskSession.all
+        else
+          user_id = params[:user_id]
+          is_active = params[:is_active]
+          logger.info "#{current_user.username} requested all #{is_active ? 'active' : ''} helpdesk sessions" << (!user_id.nil? ? " for user_id #{user_id}" : '')
+          sessions = is_active ? HelpdeskSession.active_sessions : HelpdeskSession.all
+          sessions = user_id.nil? ? sessions : sessions.where(user_id: user_id)
+          sessions
+        end
+      end
+
+      # ------------------------------------------------------------------------
       # POST /helpdesk/sessions
       # ------------------------------------------------------------------------
       desc "Begin a new session at the helpdesk as current user"
