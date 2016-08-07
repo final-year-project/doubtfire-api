@@ -19,9 +19,9 @@ module Api
       # ------------------------------------------------------------------------
       desc "Add a new helpdesk ticket"
       params do
-        requires :project_id, type: Integer, :desc => "The project to assign the ticket to"
-        optional :task_definition_id, type: Integer, :desc => "Task which the student needs help with"
-        optional :description, type: String, :desc => "Description associated to the ticket"
+        requires :project_id, type: Integer, desc: "The project to assign the ticket to"
+        optional :task_definition_id, type: Integer, desc: "Task which the student needs help with"
+        optional :description, type: String, desc: "Description associated to the ticket"
       end
       post '/helpdesk/ticket' do
         project = Project.find(params[:project_id])
@@ -29,7 +29,7 @@ module Api
 
 
         unless authorise? current_user, project, :create_ticket
-          error!({"error" => "Not authorised to create a ticket for project #{project.id}"}, 403)
+          error!({error: "Not authorised to create a ticket for project #{project.id}"}, 403)
         end
 
         ticket = HelpdeskTicket.create!({
@@ -52,16 +52,11 @@ module Api
       end
       get '/helpdesk/ticket' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
-          error!({"error" => "Not authorised to get tickets"}, 403)
+          error!({error: 'Not authorised to get tickets'}, 403)
         end
 
-        filter = params[:filter] || "all"
-
-        if filter == "resolved"
-          HelpdeskTicket.all_resolved
-        else
-          HelpdeskTicket.all_unresolved
-        end
+        filter = params[:filter] || 'all'
+        filter == 'resolved' ? HelpdeskTicket.all_resolved : HelpdeskTicket.all_unresolved
       end
 
       # ------------------------------------------------------------------------
@@ -69,13 +64,13 @@ module Api
       # ------------------------------------------------------------------------
       desc "Gets helpdesk ticket with an id"
       params do
-        requires :id, type: Integer, :desc => "The id of the ticket to get"
+        requires :id, type: Integer, desc: "The id of the ticket to get"
       end
       get '/helpdesk/ticket/:id' do
         ticket = HelpdeskTicket.find(params[:id])
 
         if not authorise? current_user, ticket, :get_details
-          error!({"error" => "Not authorised to get ticket details"}, 403)
+          error!({error: 'Not authorised to get ticket details'}, 403)
         end
 
         ticket
@@ -86,12 +81,12 @@ module Api
       # ------------------------------------------------------------------------
       desc "Updates helpdesk ticket with an id"
       params do
-        requires :id, type: Integer, :desc => "The id to of the ticket to update"
-        requires :description, type: String, :desc => "The new description of this ticket"
+        requires :id, type: Integer, desc: "The id to of the ticket to update"
+        requires :description, type: String, desc: "The new description of this ticket"
       end
       put '/helpdesk/ticket/:id' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
-          error!({"error" => "Not authorised to get tickets"}, 403)
+          error!({error: "Not authorised to get tickets"}, 403)
         end
 
         ticket_to_update = HelpdeskTicket.find(params[:id])
@@ -105,7 +100,23 @@ module Api
       # ------------------------------------------------------------------------
       # GET /helpdesk/stats
       # ------------------------------------------------------------------------
+      desc "Gets statistics about the helpdesk for the duration specified"
+      params do
+        requires :from, type: DateTime, desc: "The time to start getting statistics"
+        optional :to,   type: DateTime, desc: "The time to stop getting statistics"
+      end
+      get '/helpdesk/stats' do
+        unless authorise? current_user, HelpdeskTicket, :get_stats
+          error!({error: "Not authorised to get helpdesk stats"}, 403)
+        end
 
+        logger.info "#{current_user.username} got helpdesk statistics"
+
+        {
+          tickets_resolved:   HelpdeskTicket.resolved_betweeen(params[:from], params[:to]).length,
+          average_wait_time:  HelpdeskTicket.average_resolve_time(params[:from], params[:to])
+        }
+      end
     end
   end
 end

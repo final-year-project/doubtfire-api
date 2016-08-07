@@ -15,22 +15,14 @@ class HelpdeskTicket < ActiveRecord::Base
   def self.permissions
     # What can students do with all tickets?
     student_role_permissions = [
-      :get_details
+      :get_details,
+      :get_stats
     ]
-    # What can tutors do with all tickets?
-    tutor_role_permissions = [
+    # What can tutors|convenors|admins do with all tickets?
+    tutor_role_permissions = convenor_role_permissions = admin_role_permissions = [
       :get_tickets,
-      :get_details
-    ]
-    # What can convenors do with all tickets?
-    convenor_role_permissions = [
-      :get_tickets,
-      :get_details
-    ]
-    # What can admins do with all tickets?
-    admin_role_permissions = [
-      :get_tickets,
-      :get_details
+      :get_details,
+      :get_stats
     ]
     # What can nil users do with all tickets?
     nil_role_permissions = [
