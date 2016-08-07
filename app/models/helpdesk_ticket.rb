@@ -77,13 +77,19 @@ class HelpdeskTicket < ActiveRecord::Base
     self.save!
   end
 
+  # Get all tickets resolved between two dates
+  def self.resolved_betweeen(from = nil, to = DateTime.now)
+    to ||= DateTime.now # if nil is passed in
+    from ? all_resolved.where(resolved_at: from..to) : all_resolved
+  end
+
   # Calculates the average time to resolve a ticket from the duration
   # provided (i.e., between from and now). If no arguments are provided,
   # all resolved tickets will be used regardless of when they were resolved.
   # Where no tickets are found within the period, nil is returned.
   def self.average_resolve_time(from = nil, to = DateTime.now)
-    tickets = from ? all_resolved.where(resolved_at: from..to) : all_resolved
-    tickets.average(:minutes_to_resolve).to_f unless tickets.empty?
+    tickets = resolved_betweeen(from, to)
+    resolved_betweeen(from, to).average(:minutes_to_resolve).to_f unless tickets.empty?
   end
 
   # Resolves the ticket
