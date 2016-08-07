@@ -71,9 +71,13 @@ class HelpdeskSession < ActiveRecord::Base
   end
 
   def role_for(user)
-    user.role
+    # If the user provided is the user registered to the session, then
+    # they can do whatever they want with it. Convenors and admins can
+    # override this
+    if user == self.user || [Role.convenor, Role.admin].include?(user.role)
+      user.role
+    end
   end
-
   #
   # Override the clock off time to set it to now
   #
