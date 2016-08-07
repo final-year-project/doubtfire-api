@@ -52,8 +52,7 @@ module Api
           error!({"error" => "Not authorised to create a helpdesk session"}, 403)
         end
         user = params[:user_id] ? User.find(params[:user_id]) : current_user
-        # TODO: Doesn't this mean I can create a session on another person's behalf?
-        #       Is this what we want?
+        # TODO: if current_user != user_id passed in then require PIN
         if HelpdeskSession.user_clocked_off?(user)
           session = HelpdeskSession.create!(
             user: user,
@@ -79,6 +78,7 @@ module Api
         unless authorise? current_user, session, :clock_off_session
           error!({"error" => "Not authorised to clock off helpdesk session (id=#{session.id})"}, 403)
         end
+        # TODO: if current_user != session.user then require PIN
         if session.clocked_off?
           logger.info "#{current_user.username} attempted to clock off already clocked off helpdesk session (id=#{session.id})"
         else
