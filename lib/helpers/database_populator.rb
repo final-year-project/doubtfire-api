@@ -30,7 +30,7 @@ class DatabasePopulator
         some_tutorials: 1,
         many_tutorials: 1,
         max_tutorials: 4,
-        tickets_to_generate: 10
+        tickets_to_generate: 30
       },
       large: {
         min_students: 15,
@@ -42,7 +42,7 @@ class DatabasePopulator
         some_tutorials: 2,
         many_tutorials: 4,
         max_tutorials: 20,
-        tickets_to_generate: 50
+        tickets_to_generate: 100
       }
     }
     accepted_scale_types = scale_data.keys
@@ -193,7 +193,7 @@ class DatabasePopulator
       # 1/4 chance of getting nil task
       task = rand(0..3) == 0 ? nil : Randomizer.random_task_for_project(project)
       # 3/4 chance of being resolved
-      is_resolved = rand(0..3) != 0
+      is_resolved = rand(0..3) > 0
       if is_resolved
         minutes_to_resolve = rand(0..15)
         resolved_at = DateTime.now + minutes_to_resolve.minutes
