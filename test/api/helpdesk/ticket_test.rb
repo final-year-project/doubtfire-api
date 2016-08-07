@@ -9,7 +9,7 @@ class TicketsTest < ActiveSupport::TestCase
     Rails.application
   end
 
-  # POST /helpdesk/ticket
+  # POST /helpdesk/tickets
   def test_post_helpdesk_ticket
     project = Randomizer.random_record_for_model(Project)
 
@@ -20,29 +20,29 @@ class TicketsTest < ActiveSupport::TestCase
     }
 
     data_to_post = add_auth_token ticket, project.user
-    post_json "/api/helpdesk/ticket", data_to_post
+    post_json "/api/helpdesk/tickets", data_to_post
 
     expected_ticket = HelpdeskTicket.last
     assert_json_equal expected_ticket, last_response_body
   end
 
-  # GET /helpdesk/ticket
+  # GET /helpdesk/tickets
   def test_get_unresolved_helpdesk_tickets
-    get with_auth_token "/api/helpdesk/ticket"
+    get with_auth_token "/api/helpdesk/tickets"
     assert_json_equal HelpdeskTicket.all_unresolved, last_response_body
   end
 
-  # GET /helpdesk/ticket?filter=resolved
+  # GET /helpdesk/tickets?filter=resolved
   def test_get_resolved_helpdesk_tickets
-    get with_auth_token "/api/helpdesk/ticket?filter=resolved"
+    get with_auth_token "/api/helpdesk/tickets?filter=resolved"
     assert_json_equal HelpdeskTicket.all_resolved, last_response_body
   end
 
-  # GET /helpdesk/ticket/:id
+  # GET /helpdesk/tickets/:id
   # id = 1
   def test_get_helpdesk_ticket_with_id
     id = 1
-    get with_auth_token "/api/helpdesk/ticket/#{id}"
+    get with_auth_token "/api/helpdesk/tickets/#{id}"
     assert_json_equal HelpdeskTicket.find(id), last_response_body
   end
 end

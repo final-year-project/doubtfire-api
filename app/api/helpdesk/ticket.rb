@@ -15,7 +15,7 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # POST /helpdesk/ticket
+      # POST /helpdesk/tickets
       # ------------------------------------------------------------------------
       desc "Add a new helpdesk ticket"
       params do
@@ -23,7 +23,7 @@ module Api
         optional :task_definition_id, type: Integer, desc: "Task which the student needs help with"
         optional :description, type: String, desc: "Description associated to the ticket"
       end
-      post '/helpdesk/ticket' do
+      post '/helpdesk/tickets' do
         project = Project.find(params[:project_id])
         task = params[:task_definition_id].nil? ? nil : task = project.task_for_task_definition(params[:task_definition_id])
 
@@ -43,14 +43,14 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/ticket/:filter
+      # GET /helpdesk/tickets/:filter
       # By default all
       # ------------------------------------------------------------------------
       desc "Gets all helpdesk tickets"
       params do
         optional :filter, type: String, desc: "Filter by resolved, unresolved or all. Defaults to all (unresolved).", default: 'all'
       end
-      get '/helpdesk/ticket' do
+      get '/helpdesk/tickets' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
           error!({error: 'Not authorised to get tickets'}, 403)
         end
@@ -60,13 +60,13 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/ticket/:id
+      # GET /helpdesk/tickets/:id
       # ------------------------------------------------------------------------
       desc "Gets helpdesk ticket with an id"
       params do
         requires :id, type: Integer, desc: "The id of the ticket to get"
       end
-      get '/helpdesk/ticket/:id' do
+      get '/helpdesk/tickets/:id' do
         ticket = HelpdeskTicket.find(params[:id])
 
         if not authorise? current_user, ticket, :get_details
@@ -77,14 +77,14 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # PUT /helpdesk/ticket/:id
+      # PUT /helpdesk/tickets/:id
       # ------------------------------------------------------------------------
       desc "Updates helpdesk ticket with an id"
       params do
         requires :id, type: Integer, desc: "The id to of the ticket to update"
         requires :description, type: String, desc: "The new description of this ticket"
       end
-      put '/helpdesk/ticket/:id' do
+      put '/helpdesk/tickets/:id' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
           error!({error: "Not authorised to get tickets"}, 403)
         end
