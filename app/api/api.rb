@@ -34,6 +34,7 @@ module Api
     mount Api::Submission::BatchTask
     mount Api::Helpdesk::Ticket
     mount Api::Helpdesk::Session
+    mount Api::Helpdesk::Stats
 
     #
     # Add auth details to all end points
@@ -55,6 +56,7 @@ module Api
     AuthHelpers.add_auth_to Api::Submission::BatchTask
     AuthHelpers.add_auth_to Api::Helpdesk::Ticket
     AuthHelpers.add_auth_to Api::Helpdesk::Session
+    AuthHelpers.add_auth_to Api::Helpdesk::Stats
 
     add_swagger_documentation \
       base_path: nil,

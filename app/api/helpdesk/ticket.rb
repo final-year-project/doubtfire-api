@@ -96,27 +96,6 @@ module Api
         logger.info "#{current_user.username} updated ticket #{ticket_to_update.id}"
         ticket_to_update
       end
-
-      # ------------------------------------------------------------------------
-      # GET /helpdesk/stats
-      # ------------------------------------------------------------------------
-      desc "Gets statistics about the helpdesk for the duration specified"
-      params do
-        requires :from, type: DateTime, desc: "The time to start getting statistics"
-        optional :to,   type: DateTime, desc: "The time to stop getting statistics"
-      end
-      get '/helpdesk/stats' do
-        unless authorise? current_user, HelpdeskTicket, :get_stats
-          error!({error: "Not authorised to get helpdesk stats"}, 403)
-        end
-
-        logger.info "#{current_user.username} got helpdesk statistics"
-
-        {
-          tickets_resolved:   HelpdeskTicket.resolved_betweeen(params[:from], params[:to]).length,
-          average_wait_time:  HelpdeskTicket.average_resolve_time(params[:from], params[:to])
-        }
-      end
     end
   end
 end
