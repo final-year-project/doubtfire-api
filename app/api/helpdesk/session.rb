@@ -97,7 +97,7 @@ module Api
           error!({"error" => "Not authorised view current helpdesk staff"}, 403)
         end
         logger.info "#{current_user.username} requested all currently working helpdesk staff"
-        HelpdeskSession.users_working_now
+        ActiveModel::ArraySerializer.new(HelpdeskSession.users_working_now, each_serializer: HelpdeskUserSerializer)
       end
     end
   end

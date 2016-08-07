@@ -408,4 +408,8 @@ class User < ActiveRecord::Base
       errors:  errors
     }
   end
+
+  def units_taught
+    unit_roles.map(&:unit)
+  end
 end

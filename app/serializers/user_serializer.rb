@@ -10,3 +10,11 @@ end
 class ShallowUserSerializer < ActiveModel::Serializer
   attributes :id, :name, :email
 end
+
+class HelpdeskUserSerializer < ActiveModel::Serializer
+  attributes :id, :name, :email, :units_taught
+
+  def units_taught
+    ActiveModel::ArraySerializer.new(object.units_taught, each_serializer: ShallowUnitSerializer)
+  end
+end
