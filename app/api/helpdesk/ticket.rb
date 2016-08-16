@@ -1,4 +1,5 @@
 require 'grape'
+require 'helpdesk_ticket_serializer'
 
 module Api
   module Helpdesk
@@ -74,6 +75,23 @@ module Api
         end
 
         ticket
+      end
+
+      # ------------------------------------------------------------------------
+      # GET /helpdesk/user/tickets/:id
+      # ------------------------------------------------------------------------
+      desc "Gets all helpdesk tickets belonging to user id"
+      params do
+        requires :id, type: Integer, desc: "The id of the user to get all open tickets for"
+      end
+      get '/helpdesk/user/:id/tickets' do
+        user = User.find(params[:id])
+
+        error!({error: 'Not authorised to get ticket details'}, 403) unless user == current_user
+
+        tickets = HelpdeskTicket.where(project_id: Project.where(user_id: params[:id]), is_resolved: false)
+
+        ActiveModel::ArraySerializer.new(tickets, each_serializer: ShallowHelpdeskTicketSerializer)
       end
 
       # ------------------------------------------------------------------------

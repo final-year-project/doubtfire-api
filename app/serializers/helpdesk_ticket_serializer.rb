@@ -28,3 +28,14 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
     object.project.target_grade
   end
 end
+
+class ShallowHelpdeskTicketSerializer < ActiveModel::Serializer
+  attributes :id,
+             :project_id,
+             :task_id,
+             :description,
+             :is_resolved,
+             :created_at,
+             :resolved_at,
+             :minutes_to_resolve
+end
