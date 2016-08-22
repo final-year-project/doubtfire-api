@@ -45,10 +45,11 @@ module Api
 
       # ------------------------------------------------------------------------
       # GET /helpdesk/tickets/:filter
-      # By default all
+      # Optional User Id and Filter. Filter default to all.
       # ------------------------------------------------------------------------
-      desc "Gets all helpdesk tickets"
+      desc "Gets all helpdesk tickets. Optional User Id and Resolved filter."
       params do
+        optional :user_id, type: String, desc: "The id of the user to get tickets for."
         optional :filter, type: String, desc: "Filter by resolved, unresolved or all. Defaults to all (unresolved).", default: 'all'
       end
       get '/helpdesk/tickets' do
@@ -56,8 +57,10 @@ module Api
           error!({error: 'Not authorised to get tickets'}, 403)
         end
 
+        user_id = params[:user_id]
         filter = params[:filter] || 'all'
-        filter == 'resolved' ? HelpdeskTicket.all_resolved : HelpdeskTicket.all_unresolved
+        tickets = HelpdeskTicket.all_by_resolved_and_user(filter, user_id)
+        ActiveModel::ArraySerializer.new(tickets, each_serializer: ShallowHelpdeskTicketSerializer)
       end
 
       # ------------------------------------------------------------------------
@@ -75,23 +78,6 @@ module Api
         end
 
         ticket
-      end
-
-      # ------------------------------------------------------------------------
-      # GET /helpdesk/user/tickets/:id
-      # ------------------------------------------------------------------------
-      desc "Gets all helpdesk tickets belonging to user id"
-      params do
-        requires :id, type: Integer, desc: "The id of the user to get all open tickets for"
-      end
-      get '/helpdesk/user/:id/tickets' do
-        user = User.find(params[:id])
-
-        error!({error: 'Not authorised to get ticket details'}, 403) unless user == current_user
-
-        tickets = HelpdeskTicket.where(project_id: Project.where(user_id: params[:id]), is_resolved: false)
-
-        ActiveModel::ArraySerializer.new(tickets, each_serializer: ShallowHelpdeskTicketSerializer)
       end
 
       # ------------------------------------------------------------------------
