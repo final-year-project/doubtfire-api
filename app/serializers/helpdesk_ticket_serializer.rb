@@ -32,10 +32,16 @@ end
 class ShallowHelpdeskTicketSerializer < ActiveModel::Serializer
   attributes :id,
              :project_id,
-             :task_id,
+             :task_definition_id,
              :description,
              :is_resolved,
              :created_at,
              :resolved_at,
              :minutes_to_resolve
+
+  def task_definition_id
+    task = object.task
+    task.task_definition_id if task
+  end
+
 end
