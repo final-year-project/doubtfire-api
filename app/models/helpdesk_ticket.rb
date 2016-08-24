@@ -53,14 +53,40 @@ class HelpdeskTicket < ActiveRecord::Base
     end
   end
 
-  # Returns back all unresolved tickets
-  def self.all_unresolved
-    where(is_resolved: false)
+  def self.user_has_ticket_open?(user_id)
+    not all_resolved(user_id).empty?
   end
 
-  # Returns back all resolved tickets
-  def self.all_resolved
-    where(is_resolved: true)
+  # Returns back all unresolved tickets, optionally limit to a user
+  def self.all_unresolved(user_id = nil)
+    all_by_resolved_and_user('unresolved', user_id)
+  end
+
+  # Returns back all resolved tickets, optionally limit to a user
+  def self.all_resolved(user_id = nil)
+    all_by_resolved_and_user('resolved', user_id)
+  end
+
+  # Finds tickets of a particular resolved status, optionally limit to a user
+  def self.all_by_resolved_and_user(resolved_filter, user_id = nil)
+    tickets = nil
+
+    puts case resolved_filter
+    when "resolved"
+      tickets = where(is_resolved: true)
+    when "unresolved"
+      tickets = where(is_resolved: false)
+    else
+      tickets = all
+    end
+
+    unless user_id.nil?
+      user = User.find(user_id)
+      project = Project.for_user(user, false) # see app/models/project.rb:76
+      tickets = tickets.where(project: project) # limits the scope of tickets down to those with the project provided
+    end
+
+    tickets
   end
 
   # Resolves the ticket
