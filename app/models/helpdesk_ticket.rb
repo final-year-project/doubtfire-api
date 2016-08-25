@@ -54,7 +54,7 @@ class HelpdeskTicket < ActiveRecord::Base
   end
 
   def self.user_has_ticket_open?(user_id)
-    not all_resolved(user_id).empty?
+    not all_unresolved(user_id).empty?
   end
 
   # Returns back all unresolved tickets, optionally limit to a user

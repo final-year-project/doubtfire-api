@@ -28,9 +28,12 @@ module Api
         project = Project.find(params[:project_id])
         task = params[:task_definition_id].nil? ? nil : task = project.task_for_task_definition(params[:task_definition_id])
 
-
         unless authorise? current_user, project, :create_ticket
           error!({error: "Not authorised to create a ticket for project #{project.id}"}, 403)
+        end
+
+        if HelpdeskTicket.user_has_ticket_open?(project.student.id)
+          error!({error: "Only one ticket may be open at a time for a student"}, 403)
         end
 
         ticket = HelpdeskTicket.create!({
