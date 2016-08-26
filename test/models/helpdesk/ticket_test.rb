@@ -50,8 +50,8 @@ class HelpdeskTicketTest < ActiveSupport::TestCase
     refute @tickets[:with_description].is_resolved
   end
 
-  test "the has_task? method should be true if the task has a task" do
-    assert @tickets[:with_task].has_task?
+  test "the task? method should be true if the task has a task" do
+    assert @tickets[:with_task].task?
   end
 
   test "the student method should match the associated project's student" do

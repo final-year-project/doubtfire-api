@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160725144833) do
+ActiveRecord::Schema.define(version: 20160826233551) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,6 +93,7 @@ ActiveRecord::Schema.define(version: 20160725144833) do
     t.datetime "updated_at"
     t.datetime "resolved_at"
     t.float    "minutes_to_resolve"
+    t.boolean  "is_closed",                       default: false
   end
 
   add_index "helpdesk_tickets", ["project_id"], name: "index_helpdesk_tickets_on_project_id", using: :btree

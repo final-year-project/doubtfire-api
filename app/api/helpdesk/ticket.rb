@@ -55,7 +55,7 @@ module Api
       desc "Gets all helpdesk tickets. Optional User Id and Resolved filter."
       params do
         optional :user_id, type: String, desc: "The id of the user to get tickets for."
-        optional :filter, type: String, desc: "Filter by resolved, unresolved or all. Defaults to all (unresolved).", default: 'all'
+        optional :filter, type: String, desc: "Filter by resolved, unresolved, closed or all. Defaults to all (unresolved).", default: 'all'
       end
       get '/helpdesk/tickets' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
@@ -64,7 +64,7 @@ module Api
 
         user_id = params[:user_id]
         filter = params[:filter] || 'all'
-        tickets = HelpdeskTicket.all_by_resolved_and_user(filter, user_id)
+        tickets = HelpdeskTicket.all_by_state(filter.to_sym, user_id)
         ActiveModel::ArraySerializer.new(tickets, each_serializer: ShallowHelpdeskTicketSerializer)
       end
 
@@ -86,24 +86,31 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # PUT /helpdesk/tickets/:id
+      # DELETE /helpdesk/tickets/:id?[resolve=true|false]
       # ------------------------------------------------------------------------
       desc "Updates helpdesk ticket with an id"
       params do
-        requires :id, type: Integer, desc: "The id to of the ticket to update"
-        requires :description, type: String, desc: "The new description of this ticket"
+        requires :id, type: Integer, desc: "The id to of the ticket to delete"
+        optional :resolve, type: Boolean, desc: "Mark the ticket as resolved"
       end
-      put '/helpdesk/tickets/:id' do
-        unless authorise? current_user, HelpdeskTicket, :get_tickets
-          error!({error: "Not authorised to get tickets"}, 403)
+      delete '/helpdesk/tickets/:id' do
+        ticket = HelpdeskTicket.find(params[:id])
+
+        if params[:resolve]
+          unless authorise? current_user, ticket, :resolve_ticket
+            error!({error: "Not authorised to resolve ticket #{params[:id]}"}, 403)
+          end
+          ticket.resolve
+          logger.info "#{current_user.username} resolved ticket #{ticket_to_update.id}"
+        else
+          unless authorise? current_user, ticket, :close_ticket
+            error!({error: "Not authorised to close ticket #{params[:id]}"}, 403)
+          end
+          ticket.close
+          logger.info "#{current_user.username} closed ticket #{ticket_to_update.id}"
         end
 
-        ticket_to_update = HelpdeskTicket.find(params[:id])
-        ticket_to_update.description = params[:description]
-        ticket_to_update.save!
-
-        logger.info "#{current_user.username} updated ticket #{ticket_to_update.id}"
-        ticket_to_update
+        ticket
       end
     end
   end

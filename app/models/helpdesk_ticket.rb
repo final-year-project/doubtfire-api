@@ -16,13 +16,16 @@ class HelpdeskTicket < ActiveRecord::Base
     # What can students do with all tickets?
     student_role_permissions = [
       :get_details,
-      :get_stats
+      :get_stats,
+      :close_ticket
     ]
     # What can tutors|convenors|admins do with all tickets?
     tutor_role_permissions = convenor_role_permissions = admin_role_permissions = [
       :get_tickets,
       :get_details,
-      :get_stats
+      :get_stats,
+      :close_ticket,
+      :resolve_ticket
     ]
     # What can nil users do with all tickets?
     nil_role_permissions = [
@@ -53,32 +56,39 @@ class HelpdeskTicket < ActiveRecord::Base
     end
   end
 
+  # Returns true if a used has a ticket open
   def self.user_has_ticket_open?(user_id)
-    not all_resolved(user_id).empty?
+    !all_unresolved(user_id).empty?
   end
 
   # Returns back all unresolved tickets, optionally limit to a user
   def self.all_unresolved(user_id = nil)
-    all_by_resolved_and_user('unresolved', user_id)
+    all_by_state(:unresolved, user_id)
   end
 
   # Returns back all resolved tickets, optionally limit to a user
   def self.all_resolved(user_id = nil)
-    all_by_resolved_and_user('resolved', user_id)
+    all_by_state(:resolved, user_id)
   end
 
-  # Finds tickets of a particular resolved status, optionally limit to a user
-  def self.all_by_resolved_and_user(resolved_filter, user_id = nil)
-    tickets = nil
+  # Returns back all closed tickets, optionally limit to a user
+  def self.all_closed(user_id = nil)
+    all_by_state(:closed, user_id)
+  end
 
-    case resolved_filter
-    when "resolved"
-      tickets = where(is_resolved: true)
-    when "unresolved"
-      tickets = where(is_resolved: false)
-    else
-      tickets = all
-    end
+  # Finds tickets of a particular status, optionally limit to a user
+  def self.all_by_state(resolved_filter, user_id = nil)
+    tickets =
+      case resolved_filter
+      when :resolved
+        where(is_resolved: true)
+      when :unresolved
+        where(is_resolved: false, is_closed: false)
+      when :closed
+        where(is_closed: true)
+      else
+        all
+      end
 
     unless user_id.nil?
       user = User.find(user_id)
@@ -115,10 +125,13 @@ class HelpdeskTicket < ActiveRecord::Base
 
   # Resolves the ticket
   def resolve
-    self.is_resolved = true
-    self.resolved_at = DateTime.now
-    self.minutes_to_resolve = ((resolved_at - created_at) / 60).to_f.round(2)
-    save!
+    # Cannot resolve if closed
+    unless is_closed
+      self.is_resolved = true
+      self.resolved_at = DateTime.now
+      self.minutes_to_resolve = ((resolved_at - created_at) / 60).to_f.round(2)
+      save!
+    end
   end
 
   # Unit for ticket
@@ -132,7 +145,13 @@ class HelpdeskTicket < ActiveRecord::Base
   end
 
   # Returns true if ticket is associated with a task
-  def has_task?
+  def task?
     !task.nil?
+  end
+
+  # Prematurely closes a ticket
+  def close
+    self.is_closed = true
+    save!
   end
 end
