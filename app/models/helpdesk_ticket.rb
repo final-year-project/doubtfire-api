@@ -71,7 +71,7 @@ class HelpdeskTicket < ActiveRecord::Base
   def self.all_by_resolved_and_user(resolved_filter, user_id = nil)
     tickets = nil
 
-    puts case resolved_filter
+    case resolved_filter
     when "resolved"
       tickets = where(is_resolved: true)
     when "unresolved"

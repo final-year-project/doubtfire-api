@@ -43,5 +43,4 @@ class ShallowHelpdeskTicketSerializer < ActiveModel::Serializer
     task = object.task
     task.task_definition_id if task
   end
-
 end
