@@ -28,9 +28,14 @@ module Api
         project = Project.find(params[:project_id])
         task = params[:task_definition_id].nil? ? nil : task = project.task_for_task_definition(params[:task_definition_id])
 
-
         unless authorise? current_user, project, :create_ticket
           error!({error: "Not authorised to create a ticket for project #{project.id}"}, 403)
+        end
+
+        # Only allow them to create a new ticket if they haven't done so already
+        if HelpdeskTicket.user_has_ticket_open? project.user.id
+          logger.info "#{current_user.username} tried to create new ticket but already has one open"
+          error!({error: "User already has a ticket open"}, 403)
         end
 
         ticket = HelpdeskTicket.create!({
