@@ -6,6 +6,7 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
              :target_grade,
              :description,
              :is_resolved,
+             :is_closed,
              :created_at,
              :resolved_at,
              :minutes_to_resolve
@@ -35,6 +36,7 @@ class ShallowHelpdeskTicketSerializer < ActiveModel::Serializer
              :task_definition_id,
              :description,
              :is_resolved,
+             :is_closed,
              :created_at,
              :resolved_at,
              :minutes_to_resolve
