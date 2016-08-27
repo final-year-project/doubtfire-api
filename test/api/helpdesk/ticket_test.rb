@@ -13,6 +13,11 @@ class TicketsTest < ActiveSupport::TestCase
   def test_post_helpdesk_ticket
     project = Randomizer.random_record_for_model(Project)
 
+    # Can't create ticket if this user already has a ticket
+    while HelpdeskTicket.user_has_ticket_open? project.user_id
+      project = Randomizer.random_record_for_model(Project)
+    end
+
     ticket = {
       project_id: project.id,
       description: Populator.words(5..10),
@@ -21,30 +26,40 @@ class TicketsTest < ActiveSupport::TestCase
 
     data_to_post = add_auth_token ticket, project.user
 
-    post_json "/api/helpdesk/tickets", data_to_post
+    post_json '/api/helpdesk/tickets', data_to_post
 
+    # Last ticket ids should match
     expected_ticket = HelpdeskTicket.last
-    assert_json_equal expected_ticket, last_response_body
+    assert_json_matches_model last_response_body, expected_ticket, :id
   end
 
   # GET /helpdesk/tickets
-  def test_get_unresolved_helpdesk_tickets
-    get with_auth_token "/api/helpdesk/tickets"
-    assert_json_equal HelpdeskTicket.all_unresolved, last_response_body
+  def test_get_all_helpdesk_tickets
+    get with_auth_token '/api/helpdesk/tickets'
+    expect = ActiveModel::ArraySerializer.new(HelpdeskTicket.all, each_serializer: ShallowHelpdeskTicketSerializer)
+    assert_json_equal expect, last_response_body
+  end
+
+  # GET /helpdesk/tickets
+  def test_get_all_unresolved_helpdesk_tickets
+    get with_auth_token '/api/helpdesk/tickets?filter=unresolved'
+    expect = ActiveModel::ArraySerializer.new(HelpdeskTicket.all_unresolved, each_serializer: ShallowHelpdeskTicketSerializer)
+    assert_json_equal expect, last_response_body
   end
 
   # GET /helpdesk/tickets?filter=resolved
   def test_get_resolved_helpdesk_tickets
-    get with_auth_token "/api/helpdesk/tickets?filter=resolved"
-    assert_json_equal HelpdeskTicket.all_resolved, last_response_body
+    get with_auth_token '/api/helpdesk/tickets?filter=resolved'
+    expect = ActiveModel::ArraySerializer.new(HelpdeskTicket.all_resolved, each_serializer: ShallowHelpdeskTicketSerializer)
+    assert_json_equal expect, last_response_body
   end
 
-  # GET /helpdesk/user/tickets?
-  def test_get_resolved_helpdesk_tickets
+  # GET /helpdesk/tickets?user_id=1&filter=resolved
+  def test_get_resolved_helpdesk_tickets_for_user
     id = 1
-    get with_auth_token "/api/helpdesk/user/#{id}/tickets"
-    puts "HERE:::"
-    puts last_response_body
+    get with_auth_token "/api/helpdesk/tickets?user_id=#{id}&filter=resolved"
+    expect = ActiveModel::ArraySerializer.new(HelpdeskTicket.all_resolved(id), each_serializer: ShallowHelpdeskTicketSerializer)
+    assert_json_equal expect, last_response_body
   end
 
   # GET /helpdesk/tickets/:id
@@ -52,6 +67,7 @@ class TicketsTest < ActiveSupport::TestCase
   def test_get_helpdesk_ticket_with_id
     id = 1
     get with_auth_token "/api/helpdesk/tickets/#{id}"
-    assert_json_equal HelpdeskTicket.find(id), last_response_body
+    expect = HelpdeskTicketSerializer.new HelpdeskTicket.find(id)
+    assert_json_equal expect, last_response_body
   end
 end

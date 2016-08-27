@@ -144,13 +144,6 @@ ActiveRecord::Schema.define(version: 20160826233551) do
   add_index "plagiarism_match_links", ["other_task_id"], name: "index_plagiarism_match_links_on_other_task_id", using: :btree
   add_index "plagiarism_match_links", ["task_id"], name: "index_plagiarism_match_links_on_task_id", using: :btree
 
-  create_table "project_convenors", force: :cascade do |t|
-    t.integer  "unit_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "projects", force: :cascade do |t|
     t.integer  "unit_id"
     t.string   "project_role",              limit: 255
@@ -290,20 +283,6 @@ ActiveRecord::Schema.define(version: 20160826233551) do
   add_index "tasks", ["project_id"], name: "index_tasks_on_project_id", using: :btree
   add_index "tasks", ["task_definition_id"], name: "index_tasks_on_task_definition_id", using: :btree
   add_index "tasks", ["task_status_id"], name: "index_tasks_on_task_status_id", using: :btree
-
-  create_table "teams", force: :cascade do |t|
-    t.integer  "unit_id"
-    t.integer  "user_id"
-    t.string   "meeting_day",      limit: 255
-    t.string   "meeting_time",     limit: 255
-    t.string   "meeting_location", limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "official_name",    limit: 255
-  end
-
-  add_index "teams", ["unit_id"], name: "index_teams_on_unit_id", using: :btree
-  add_index "teams", ["user_id"], name: "index_teams_on_user_id", using: :btree
 
   create_table "tutorials", force: :cascade do |t|
     t.integer  "unit_id"

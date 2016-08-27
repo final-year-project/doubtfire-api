@@ -49,13 +49,13 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/tickets/:filter
+      # GET /helpdesk/tickets?filter={resolved,unresolved,closed,all}&user_id={id}
       # Optional User Id and Filter. Filter default to all.
       # ------------------------------------------------------------------------
       desc "Gets all helpdesk tickets. Optional User Id and Resolved filter."
       params do
         optional :user_id, type: String, desc: "The id of the user to get tickets for."
-        optional :filter, type: String, desc: "Filter by resolved, unresolved, closed or all. Defaults to all (unresolved).", default: 'all'
+        optional :filter, type: String, desc: "Filter by resolved, unresolved, closed or all. Defaults to all.", default: 'all'
       end
       get '/helpdesk/tickets' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
