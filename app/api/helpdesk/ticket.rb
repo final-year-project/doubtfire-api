@@ -96,18 +96,18 @@ module Api
       delete '/helpdesk/tickets/:id' do
         ticket = HelpdeskTicket.find(params[:id])
 
-        if params[:resolve]
+        if params[:resolve] == true
           unless authorise? current_user, ticket, :resolve_ticket
             error!({error: "Not authorised to resolve ticket #{params[:id]}"}, 403)
           end
           ticket.resolve
-          logger.info "#{current_user.username} resolved ticket #{ticket_to_update.id}"
+          logger.info "#{current_user.username} resolved ticket #{ticket.id}"
         else
           unless authorise? current_user, ticket, :close_ticket
             error!({error: "Not authorised to close ticket #{params[:id]}"}, 403)
           end
           ticket.close
-          logger.info "#{current_user.username} closed ticket #{ticket_to_update.id}"
+          logger.info "#{current_user.username} closed ticket #{ticket.id}"
         end
 
         ticket

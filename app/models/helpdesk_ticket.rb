@@ -81,7 +81,7 @@ class HelpdeskTicket < ActiveRecord::Base
     tickets =
       case resolved_filter
       when :resolved
-        where(is_resolved: true)
+        where(is_resolved: true, is_closed: true)
       when :unresolved
         where(is_resolved: false, is_closed: false)
       when :closed
@@ -97,12 +97,6 @@ class HelpdeskTicket < ActiveRecord::Base
     end
 
     tickets
-  end
-
-  # Resolves the ticket
-  def resolve
-    self.is_resolved = true
-    self.save!
   end
 
   # Get all tickets resolved between two dates
@@ -151,7 +145,9 @@ class HelpdeskTicket < ActiveRecord::Base
 
   # Prematurely closes a ticket
   def close
-    self.is_closed = true
-    save!
+    unless is_closed
+      self.is_closed = true
+      save!
+    end
   end
 end

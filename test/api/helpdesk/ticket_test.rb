@@ -70,4 +70,26 @@ class TicketsTest < ActiveSupport::TestCase
     expect = HelpdeskTicketSerializer.new HelpdeskTicket.find(id)
     assert_json_equal expect, last_response_body
   end
+
+  # DELETE /helpdesk/tickets/:id?resolve=false
+  def test_delete_a_ticket_by_closing
+    ticket = HelpdeskTicket.all_unresolved.first
+    delete with_auth_token "/api/helpdesk/tickets/#{ticket.id}"
+    # Reload the ticket from DB with updated info
+    ticket = HelpdeskTicket.find(ticket.id)
+    assert ticket.is_closed
+    refute ticket.is_resolved
+  end
+
+  # DELETE /helpdesk/tickets/:id?resolve=true
+  def test_delete_a_ticket_by_resolving
+    ticket = HelpdeskTicket.all_unresolved.first
+    delete with_auth_token "/api/helpdesk/tickets/#{ticket.id}?resolve=true"
+    # Reload the ticket from DB with updated info
+    ticket = HelpdeskTicket.find(ticket.id)
+    assert ticket.is_resolved
+    refute ticket.is_closed
+    dt = DateTime.parse(last_response_body['resolved_at']).inspect
+    assert dt, ticket.resolved_at
+  end
 end
