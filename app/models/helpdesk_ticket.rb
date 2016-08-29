@@ -16,6 +16,7 @@ class HelpdeskTicket < ActiveRecord::Base
     # What can students do with all tickets?
     student_role_permissions = [
       :get_details,
+      :get_tickets,
       :get_stats,
       :close_ticket
     ]
