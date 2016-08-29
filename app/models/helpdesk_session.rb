@@ -100,7 +100,7 @@ class HelpdeskSession < ActiveRecord::Base
     sessions_by_staff_between.map do |user, sessions|
       durations = sessions.map(&:session_duration)
       average_duration = durations.inject(:+) / durations.length
-      { user: user, duration: average_duration }
+      { user_id: user.id, duration: average_duration }
     end
   end
   def self.average_session_time_by_staff
@@ -113,7 +113,7 @@ class HelpdeskSession < ActiveRecord::Base
   #
   def self.session_count_by_staff_between(from = nil, to = DateTime.now)
     sessions_by_staff_between.map do |user, sessions|
-      { user: user, count: sessions.count }
+      { user_id: user.id, count: sessions.count }
     end
   end
   def self.session_count_by_staff
