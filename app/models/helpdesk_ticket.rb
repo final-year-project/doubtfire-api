@@ -81,7 +81,7 @@ class HelpdeskTicket < ActiveRecord::Base
     tickets =
       case resolved_filter
       when :resolved
-        where(is_resolved: true, is_closed: true)
+        where(is_resolved: true)
       when :unresolved
         where(is_resolved: false, is_closed: false)
       when :closed
