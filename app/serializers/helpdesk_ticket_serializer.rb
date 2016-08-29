@@ -7,6 +7,7 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
              :description,
              :is_resolved,
              :is_closed,
+             :project_id,
              :created_at,
              :resolved_at,
              :minutes_to_resolve
