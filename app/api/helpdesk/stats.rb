@@ -31,11 +31,14 @@ module Api
         from = params[:from]
         to   = params[:to] || DateTime.now
 
+        avg_resolve = HelpdeskTicket.average_resolve_time_between(from, to) || 0
+        avg_wait = avg_resolve * HelpdeskTicket.all_unresolved.length
+
         response = {
           tickets: {
             resolved_count:     HelpdeskTicket.resolved_betweeen(from, to).length,
             number_unresolved:  HelpdeskTicket.all_unresolved.length,
-            average_wait_time:  HelpdeskTicket.average_resolve_time_between(from, to) * HelpdeskTicket.all_unresolved.length,
+            average_wait_time:  avg_wait
           }
         }
 
