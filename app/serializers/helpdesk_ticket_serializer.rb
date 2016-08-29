@@ -2,6 +2,7 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
   attributes :id,
              :student,
              :task,
+             :task_definition_id,
              :tutorial,
              :target_grade,
              :description,
@@ -28,6 +29,11 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
 
   def target_grade
     object.project.target_grade
+  end
+
+  def task_definition_id
+    task = object.task
+    task.task_definition_id if task
   end
 end
 
