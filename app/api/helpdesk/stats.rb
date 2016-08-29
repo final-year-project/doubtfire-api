@@ -36,7 +36,7 @@ module Api
 
         response = {
           tickets: {
-            resolved_count:     HelpdeskTicket.resolved_betweeen(from, to).length,
+            resolved_count:     HelpdeskTicket.resolved_between(from, to).length,
             number_unresolved:  HelpdeskTicket.all_unresolved.length,
             average_wait_time:  avg_wait
           }
