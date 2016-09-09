@@ -31,23 +31,16 @@ module Api
         from = params[:from]
         to   = params[:to] || DateTime.now
 
-        avg_resolve = HelpdeskTicket.average_resolve_time_between(from, to) || 0
-        avg_wait = avg_resolve * HelpdeskTicket.all_unresolved.length
-
         response = {
           tickets: {
             resolved_count:     HelpdeskTicket.resolved_between(from, to).length,
             number_unresolved:  HelpdeskTicket.all_unresolved.length,
-            average_wait_time:  avg_wait
+            average_wait_time:  HelpdeskTicket.average_wait_time(from, to)
           }
         }
 
         if authorise? current_user, HelpdeskSession, :get_stats
-          response[:sessions] = {
-            all_session_count:            HelpdeskSession.sessions_between(from, to).length,
-            session_count_by_staff_id:    HelpdeskSession.session_count_by_staff_between(from, to),
-            avg_session_time_by_staff_id: HelpdeskSession.average_session_time_by_staff_between(from, to)
-          }
+          response[:sessions] = stats_by_staff_id(from, to)
         end
 
         response

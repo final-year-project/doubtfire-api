@@ -93,34 +93,6 @@ class HelpdeskSession < ActiveRecord::Base
   end
 
   #
-  # Returns the average time of staff sessions within the given timeframe
-  # grouped by user id
-  #
-  def self.average_session_time_by_staff_between(from = nil, to = DateTime.now)
-    sessions_by_staff_between.map do |user, sessions|
-      durations = sessions.map(&:session_duration)
-      average_duration = durations.inject(:+) / durations.length
-      { user_id: user.id, duration: average_duration }
-    end
-  end
-  def self.average_session_time_by_staff
-    average_session_time_by_staff_between
-  end
-
-  #
-  # Returns the count of staff sessions within the given timeframe
-  # grouped by user id
-  #
-  def self.session_count_by_staff_between(from = nil, to = DateTime.now)
-    sessions_by_staff_between.map do |user, sessions|
-      { user_id: user.id, count: sessions.count }
-    end
-  end
-  def self.session_count_by_staff
-    session_count_by_staff_between
-  end
-
-  #
   # Returns the staff sessions within the given timeframe grouped by user id
   #
   def self.sessions_by_staff_between(from = nil, to = DateTime.now)
@@ -128,6 +100,22 @@ class HelpdeskSession < ActiveRecord::Base
   end
   def self.sessions_by_staff
     sessions_by_staff_between
+  end
+
+  #
+  # Returns all session stats between the timeframe
+  #
+  def self.stats_by_staff_id(from = nil, to = DateTime.now)
+    sessions_by_staff_between(from, to).map do |user, sessions|
+      durations = sessions.map(&:session_duration)
+      average_duration = durations.inject(:+) / durations.length
+      count = sessions.length
+      {
+        user_id: user.id,
+        duration: average_duration,
+        count: count
+      }
+    end
   end
 
   #

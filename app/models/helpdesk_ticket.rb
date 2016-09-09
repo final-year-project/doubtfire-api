@@ -114,8 +114,13 @@ class HelpdeskTicket < ActiveRecord::Base
     tickets = resolved_between(from, to)
     resolved_between(from, to).average(:minutes_to_resolve).to_f unless tickets.empty?
   end
-  def self.average_resolve_time
-    average_resolve_time_between
+
+  #
+  # Determines the current average wait time for a ticket
+  #
+  def self.average_wait_time(from, to)
+    avg_resolve = HelpdeskTicket.average_resolve_time_between(from, to) || 0
+    avg_resolve * HelpdeskTicket.all_unresolved.length
   end
 
   # Resolves the ticket
