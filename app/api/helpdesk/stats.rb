@@ -40,7 +40,7 @@ module Api
         }
 
         if authorise? current_user, HelpdeskSession, :get_stats
-          response[:sessions] = stats_by_staff_id(from, to)
+          response[:sessions] = HelpdeskSession.stats_by_staff_id(from, to)
         end
 
         response
