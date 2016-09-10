@@ -88,8 +88,8 @@ class TicketsTest < ActiveSupport::TestCase
     # Reload the ticket from DB with updated info
     ticket = HelpdeskTicket.find(ticket.id)
     assert ticket.is_resolved
-    refute ticket.is_closed
-    dt = DateTime.parse(last_response_body['resolved_at']).inspect
-    assert dt, ticket.resolved_at
+    assert ticket.is_closed
+    dt = DateTime.parse(last_response_body['closed_at']).inspect
+    assert dt, ticket.closed_at
   end
 end

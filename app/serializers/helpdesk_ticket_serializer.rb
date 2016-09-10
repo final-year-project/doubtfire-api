@@ -9,7 +9,7 @@ class HelpdeskTicketSerializer < ActiveModel::Serializer
              :is_resolved,
              :is_closed,
              :created_at,
-             :resolved_at,
+             :closed_at,
              :minutes_to_resolve
 
   def project
@@ -30,7 +30,7 @@ class ShallowHelpdeskTicketSerializer < ActiveModel::Serializer
              :is_resolved,
              :is_closed,
              :created_at,
-             :resolved_at,
+             :closed_at,
              :minutes_to_resolve
 
   def task_definition_id

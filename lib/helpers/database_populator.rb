@@ -196,14 +196,15 @@ class DatabasePopulator
       is_resolved = rand(0..3) > 0
       if is_resolved
         minutes_to_resolve = rand(0..15)
-        resolved_at = DateTime.now + minutes_to_resolve.minutes
+        closed_at = DateTime.now + minutes_to_resolve.minutes
       end
       HelpdeskTicket.create(
         project: project,
         task: task,
         description: Populator.words(5..10),
         is_resolved: is_resolved,
-        resolved_at: resolved_at,
+        is_closed: is_resolved,
+        closed_at: closed_at,
         minutes_to_resolve: minutes_to_resolve
       )
       print "."

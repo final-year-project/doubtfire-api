@@ -84,9 +84,9 @@ class HelpdeskTicket < ActiveRecord::Base
       when :resolved
         where(is_resolved: true)
       when :unresolved
-        where(is_resolved: false, is_closed: false)
+        where(is_closed: false)
       when :closed
-        where(is_closed: true)
+        where(is_closed: true, is_resolved: false)
       else
         all
       end
@@ -103,7 +103,7 @@ class HelpdeskTicket < ActiveRecord::Base
   # Get all tickets resolved between two dates
   def self.resolved_between(from = nil, to = DateTime.now)
     to ||= DateTime.now # if nil is passed in
-    from ? all_resolved.where(resolved_at: from..to) : all_resolved
+    from ? all_resolved.where(closed_at: from..to) : all_resolved
   end
 
   # Calculates the average time to resolve a ticket from the duration
@@ -125,11 +125,11 @@ class HelpdeskTicket < ActiveRecord::Base
 
   # Resolves the ticket
   def resolve
-    # Cannot resolve if closed
     unless is_closed
+      # Resolving closes the ticket
+      close
       self.is_resolved = true
-      self.resolved_at = DateTime.now
-      self.minutes_to_resolve = ((resolved_at - created_at) / 60).to_f.round(2)
+      self.minutes_to_resolve = ((closed_at - created_at) / 60).to_f.round(2)
       save!
     end
   end
@@ -153,6 +153,7 @@ class HelpdeskTicket < ActiveRecord::Base
   def close
     unless is_closed
       self.is_closed = true
+      self.closed_at = DateTime.now
       save!
     end
   end
