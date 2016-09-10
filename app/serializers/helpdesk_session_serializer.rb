@@ -7,7 +7,7 @@ class HelpdeskSessionSerializer < ActiveModel::Serializer
              :clock_on_time,
              :clock_off_time
 
-  has_one :user, serializer: ShallowUserSerializer
+  has_one :user, serializer: HelpdeskUserSerializer
 
   def clocked_on?
     object.clocked_on?
