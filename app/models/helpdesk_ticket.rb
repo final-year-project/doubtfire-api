@@ -97,7 +97,7 @@ class HelpdeskTicket < ActiveRecord::Base
       tickets = tickets.where(project: project) # limits the scope of tickets down to those with the project provided
     end
 
-    tickets
+    tickets.order(:created_at)
   end
 
   # Get all tickets resolved between two dates
