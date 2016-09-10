@@ -56,6 +56,7 @@ module Api
       params do
         optional :user_id, type: String, desc: "The id of the user to get tickets for."
         optional :filter, type: String, desc: "Filter by resolved, unresolved, closed or all. Defaults to all.", default: 'all'
+        optional :shallow, type: Boolean, desc: "Use shallow serializer vs detailed serializer", default: true
       end
       get '/helpdesk/tickets' do
         unless authorise? current_user, HelpdeskTicket, :get_tickets
@@ -65,7 +66,9 @@ module Api
         user_id = params[:user_id]
         filter = params[:filter] || 'all'
         tickets = HelpdeskTicket.all_by_state(filter.to_sym, user_id)
-        ActiveModel::ArraySerializer.new(tickets, each_serializer: ShallowHelpdeskTicketSerializer)
+
+        serializer = params[:shallow] ? ShallowHelpdeskTicketSerializer : HelpdeskTicketSerializer
+        ActiveModel::ArraySerializer.new(tickets, each_serializer: serializer)
       end
 
       # ------------------------------------------------------------------------

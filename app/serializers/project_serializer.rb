@@ -10,6 +10,31 @@ class ShallowProjectSerializer < ActiveModel::Serializer
   def project_id
     object.id
   end
+
+  def student_name
+    object.student.name
+  end
+
+  def unit_id
+    object.unit.id
+  end
+
+  def unit_code
+    object.unit.code
+  end
+
+  def unit_name
+    object.unit.name
+  end
+
+  def tutor_name
+    tutorial = object.tutorial
+    tutorial.tutor.name if tutorial
+  end
+
+  def start_date
+    object.unit.start_date.to_date
+  end
 end
 
 # Student project serializer is used with teaching staff

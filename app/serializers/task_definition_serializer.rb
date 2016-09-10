@@ -1,3 +1,7 @@
+class ShallowTaskDefinitionSerializer < ActiveModel::Serializer
+  attributes :id, :abbreviation, :name, :description
+end
+
 class TaskDefinitionSerializer < ActiveModel::Serializer
   attributes :id, :abbreviation, :name, :description,
     :weight, :target_grade, :target_date,
