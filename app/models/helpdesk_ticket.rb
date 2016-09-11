@@ -106,6 +106,15 @@ class HelpdeskTicket < ActiveRecord::Base
     from ? all_resolved.where(closed_at: from..to) : all_resolved
   end
 
+  #
+  # Get all tickets that were still unresolved between from and to
+  # dates
+  #
+  def self.unresolved_between(from, to = DateTime.now)
+    to ||= DateTime.now # if nil passed in
+    where('created_at >= ? AND closed_at >= ?', from, to)
+  end
+
   # Calculates the average time to resolve a ticket from the duration
   # provided (i.e., between from and now). If no arguments are provided,
   # all resolved tickets will be used regardless of when they were resolved.
@@ -120,7 +129,8 @@ class HelpdeskTicket < ActiveRecord::Base
   #
   def self.average_wait_time(from, to)
     avg_resolve = HelpdeskTicket.average_resolve_time_between(from, to) || 0
-    avg_resolve * HelpdeskTicket.all_unresolved.length
+    num_tickets = HelpdeskTicket.unresolved_between(from, to).length
+    avg_resolve * num_tickets
   end
 
   # Resolves the ticket

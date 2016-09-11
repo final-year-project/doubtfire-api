@@ -112,7 +112,7 @@ class HelpdeskSession < ActiveRecord::Base
       count = sessions.length
       {
         user_id: user.id,
-        duration: average_duration,
+        average_duration_in_hours: average_duration,
         count: count
       }
     end
