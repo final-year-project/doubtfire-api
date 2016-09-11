@@ -112,7 +112,7 @@ class HelpdeskTicket < ActiveRecord::Base
   #
   def self.unresolved_between(from, to = DateTime.now)
     to ||= DateTime.now # if nil passed in
-    where('created_at >= ? AND closed_at >= ?', from, to)
+    where('(created_at >= ? AND closed_at >= ?) OR (created_at < ? AND is_closed = false)', from, to, to)
   end
 
   # Calculates the average time to resolve a ticket from the duration

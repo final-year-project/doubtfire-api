@@ -3,7 +3,7 @@ require 'grape'
 module Api
   module Helpdesk
     #
-    # Helpdesk session system endpoints
+    # Helpdesk ticket stats endpoints
     #
     class Stats < Grape::API
       helpers AuthHelpers
@@ -15,13 +15,13 @@ module Api
       end
 
       # ------------------------------------------------------------------------
-      # GET /helpdesk/stats/tickets
+      # GET /helpdesk/stats
       # ------------------------------------------------------------------------
       desc "Gets tickets statistics about the helpdesk for the duration specified"
       params do
         optional :from,     type: DateTime, desc: "The time to start getting statistics (do not provide for all stats)"
         optional :to,       type: DateTime, desc: "The time to stop getting statistics (defaults to current time)", default: DateTime.now
-        optional :interval, type: Integer,  desc: "Interval of graph data (in seconds)", default: 30
+        optional :interval, type: Integer,  desc: "Interval of graph data (in seconds)"
       end
       get '/helpdesk/stats' do
         unless authorise? current_user, HelpdeskTicket, :get_stats
@@ -29,18 +29,18 @@ module Api
         end
         logger.info "#{current_user.username} got ticket helpdesk statistics"
 
-        from = params[:from]
-        to   = params[:to] || DateTime.now
-        interval = params[:interval] || 30
+        from     = params[:from] || HelpdeskTicket.first.created_at - 1.day
+        to       = params[:to]   || DateTime.now
 
         # Calculate an acceptable interval for the range given that won't
         # hurt the server. Subtract the from and to dates and work out the
         # number of seconds between them divide by the data limit --
         # that is the minimum interval accepted
-        DATA_LIMIT = 30
-        min_interval = (((to - from) * 60 * 60 * 24) / DATA_LIMIT).to_f
+        data_limit = 35 # 30 records
+        min_interval = (((to - from) * 60 * 60 * 24) / data_limit).to_f
+        interval = params[:interval] || min_interval
         if interval < min_interval
-          error!({error: "Bad interval - must be greater than #{min_interval} "\
+          error!({error: "Bad interval - must be greater than #{min_interval.to_i} "\
                          "seconds = #{(min_interval / 60).to_i} minutes = "\
                          "#{(min_interval / 60 / 60).to_i} = hours = " \
                          "#{(min_interval / 60 / 60 / 24).to_i} days"}, 403)
@@ -51,7 +51,7 @@ module Api
         graph_interval = interval.seconds
 
         while graph_time < to
-          unix_time = graph_time.to_i
+          unix_time = graph_time.to_i * 1000
           range_from = graph_time
           range_to   = graph_time + graph_interval
           graph_data[:average_wait_time_in_mins] <<
@@ -66,8 +66,8 @@ module Api
         }
 
         response[:tickets] = {
-          resolved_count:     HelpdeskTicket.resolved_between(from, to).length,
-          number_unresolved:  HelpdeskTicket.all_unresolved.length,
+          resolved_count:             HelpdeskTicket.resolved_between(from, to).length,
+          number_unresolved:          HelpdeskTicket.all_unresolved.length,
           average_wait_time_in_mins:  HelpdeskTicket.average_wait_time(from, to)
         }
 
