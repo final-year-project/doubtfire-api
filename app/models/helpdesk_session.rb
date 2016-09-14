@@ -47,7 +47,7 @@ class HelpdeskSession < ActiveRecord::Base
       :clock_off_session,
       :get_all_current_session_users,
       :get_sessions,
-      :get_stats
+      :get_ticket_stats
     ]
     # What can admins do with sessions?
     admin_role_permissions = [
@@ -55,7 +55,7 @@ class HelpdeskSession < ActiveRecord::Base
       :clock_off_session,
       :get_all_current_session_users,
       :get_sessions,
-      :get_stats
+      :get_ticket_stats
     ]
     # What can nil users do with sessions?
     nil_role_permissions = [

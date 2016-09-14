@@ -17,14 +17,14 @@ class HelpdeskTicket < ActiveRecord::Base
     student_role_permissions = [
       :get_details,
       :get_tickets,
-      :get_stats,
+      :get_ticket_stats,
       :close_ticket
     ]
     # What can tutors|convenors|admins do with all tickets?
     tutor_role_permissions = convenor_role_permissions = admin_role_permissions = [
       :get_tickets,
       :get_details,
-      :get_stats,
+      :get_ticket_stats,
       :close_ticket,
       :resolve_ticket
     ]
@@ -112,7 +112,7 @@ class HelpdeskTicket < ActiveRecord::Base
   #
   def self.unresolved_between(from, to = DateTime.now)
     to ||= DateTime.now # if nil passed in
-    where('(created_at >= ? AND closed_at >= ?) OR (created_at < ? AND is_closed = false)', from, to, to)
+    where('created_at <= ? AND (closed_at >= ? OR NOT is_closed)', from, to)
   end
 
   # Calculates the average time to resolve a ticket from the duration
@@ -121,7 +121,7 @@ class HelpdeskTicket < ActiveRecord::Base
   # Where no tickets are found within the period, nil is returned.
   def self.average_resolve_time_between(from = nil, to = DateTime.now)
     tickets = resolved_between(from, to)
-    resolved_between(from, to).average(:minutes_to_resolve).to_f unless tickets.empty?
+    resolved_between(from, to).average(:minutes_to_resolve).to_i unless tickets.empty?
   end
 
   #
