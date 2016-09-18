@@ -365,7 +365,7 @@ class DatabasePopulator
       # only up to 4 tutorials for small scale
       if tutorial_count > max_tutorials then break end
 
-      tutor = @user_cache[user_details[:user]]
+      tutor = User.where(username: user_details[:user]).first
       puts "----> Enrolling tutor #{tutor.name} with #{user_details[:num]} tutorials"
       tutor_unit_role = unit.employ_staff(tutor, Role.tutor)
 
@@ -416,18 +416,8 @@ class DatabasePopulator
       joostfunkekupper:   {first_name: "Joost",   last_name: "Funke Kupper",  nickname: "Joe",            role_id: Role.tutor_id },
       angusmorton:        {first_name: "Angus",   last_name: "Morton",        nickname: "Angus",          role_id: Role.tutor_id },
       "123456X" =>        {first_name: "Fred",    last_name: "Jones",         nickname: "Foo",            role_id: Role.student_id },
-      astudent:           {first_name: "student", last_name: "surname",       nickname: "Foo",            role_id: Role.student_id }
+      astudent:           {first_name: "Jane",    last_name: "Austen",       nickname: "Foo",            role_id: Role.student_id }
     }
-    # Add 10 tutors to fixed info
-    10.times do |count|
-      tutor_name = "tutor_#{count}";
-      @user_data[tutor_name] = {
-        first_name: Faker::Name.first_name,
-        last_name: Faker::Name.last_name,
-        nickname: tutor_name,
-        role_id: Role.tutor_id
-      }
-    end
     # Define fixed unit details here
     many_tutorials = @scale[:many_tutorials]
     some_tutorials = @scale[:some_tutorials]
@@ -490,9 +480,22 @@ class DatabasePopulator
         ],
         num_tasks: few_tasks,
         ilos: rand(0..3),
-        students: [ :acain, :aadmin ]
+        students: [ :acain, :aadmin, :astudent ]
       },
     }
     puts "-> Defined #{@user_data.length} fixed users and #{@unit_data.length} units"
+    # Add 10 tutors to fixed info
+    10.times do |count|
+      tutor_name = "tutor_#{count}"
+      @user_data[tutor_name] = {
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        nickname: tutor_name,
+        role_id: Role.tutor_id
+      }
+      # Add tutor to random unit
+      unit = @unit_data.keys.sample
+      @unit_data[unit][:tutors] << { user: tutor_name.to_sym, num: few_tutorials }
+    end
   end
 end
