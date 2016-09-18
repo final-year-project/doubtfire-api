@@ -62,8 +62,8 @@ module Api
           range = Time.at(unix_t + interval).utc..Time.at(unix_t).utc
           # Stats to include
           unless ENV['SIMULATE_GRAPH']
-            avg_wait   = HelpdeskTicket.average_wait_time(range.first, range.last)
-            unresolved = HelpdeskTicket.unresolved_between(range.first, range.last)
+            avg_wait   = HelpdeskTicket.average_wait_time(range.last, range.first)
+            unresolved = HelpdeskTicket.unresolved_between(range.first, range.last).length
           else
             last = graph_data.keys.last
             last = graph_data[last]
