@@ -188,16 +188,18 @@ class DatabasePopulator
   def generate_helpdesk_tickets
     tickets_to_generate = @scale[:tickets_to_generate]
     print "-> Generating #{tickets_to_generate} helpdesk tickets"
-    tickets_to_generate.times do
+    tickets_to_generate.times do |idx|
       project = Randomizer.random_record_for_model(Project)
+      num_open = 4
       throw "Must create projects before calling generate_helpdesk_tickets" if project.nil?
       # 1/4 chance of getting nil task
-      task = rand(0..3) == 0 ? nil : Randomizer.random_task_for_project(project)
+      task = rand(0..3) > 0 ? Randomizer.random_task_for_project(project) : nil
       # 3/4 chance of being resolved
-      is_resolved = rand(0..3) > 0
+      is_resolved = idx < (tickets_to_generate - num_open)
       if is_resolved
+        created_at = rand(0..180).minutes.ago
         minutes_to_resolve = rand(0..15)
-        closed_at = DateTime.now + minutes_to_resolve.minutes
+        closed_at = created_at + minutes_to_resolve.minutes
       end
       HelpdeskTicket.create(
         project: project,
@@ -206,9 +208,17 @@ class DatabasePopulator
         is_resolved: is_resolved,
         is_closed: is_resolved,
         closed_at: closed_at,
+        created_at: created_at,
         minutes_to_resolve: minutes_to_resolve
       )
       print "."
+    end
+    2.times do
+      HelpdeskSession.create(
+        user: Randomizer.random_record_for_model(Unit).tutors.sample,
+        clock_on_time: rand(0..180).minutes.ago,
+        clock_off_time: DateTime.now + rand(0..45).minutes
+      )
     end
     puts "!"
   end
