@@ -61,12 +61,23 @@ module Api
           # to graph_time
           range = Time.at(unix_t + interval).utc..Time.at(unix_t).utc
           # Stats to include
-          avg_wait   = HelpdeskTicket.average_wait_time(range.first, range.last)
-          unresolved = HelpdeskTicket.unresolved_between(range.first, range.last)
+          unless ENV['SIMULATE_GRAPH']
+            avg_wait   = HelpdeskTicket.average_wait_time(range.first, range.last)
+            unresolved = HelpdeskTicket.unresolved_between(range.first, range.last)
+          else
+            last = graph_data.keys.last
+            last = graph_data[last]
+            avg_wait   = last.nil? ? rand(0..10) : last[:average_wait_time_in_mins]
+            unresolved = last.nil? ? rand(0..10) : last[:number_of_unresolved_tickets]
+            avg_wait += rand(-2..2)
+            avg_wait = avg_wait < 0 ? 0 : avg_wait
+            unresolved += rand(-2..2)
+            unresolved = unresolved < 0 ? 0 : unresolved
+          end
           # Insert at this time the stats there were
           graph_data[unix_t] = {
             average_wait_time_in_mins:    avg_wait,
-            number_of_unresolved_tickets: unresolved.length # count only
+            number_of_unresolved_tickets: unresolved # count only
           }
         end
         graph_data
