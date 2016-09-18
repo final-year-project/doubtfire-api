@@ -46,6 +46,7 @@ class DatabasePopulator
       }
     }
     accepted_scale_types = scale_data.keys
+    scale = scale.to_sym
     unless accepted_scale_types.include?(scale)
       throw "Invalid scale value '#{scale}'. Acceptable values are: #{accepted_scale_types.join(", ")}"
     else
